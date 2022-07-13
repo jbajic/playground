@@ -1,0 +1,6 @@
+# bazel specifics
+bazel_linksbin
+bazel_linkscpp
+bazel_linksout
+bazel_linkslogs
+bazel_linkstestlogs

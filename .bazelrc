@@ -1,0 +1,46 @@
+# Don't create bazel-* symlinks in the WORKSPACE directory.
+# These require .gitignore and may scare users.
+# Also, it's a workaround for https://github.com/bazelbuild/rules_typescript/issues/12
+# which affects the common case of having `tsconfig.json` in the WORKSPACE directory.
+#
+# Instead, you should run `bazel info bazel-bin` to find out where the outputs went.
+build --symlink_prefix=~/bazel_links
+
+build --disk_cache=~/bazel_cache
+
+build --copt=-std=c++20
+build --copt=-Wall
+build --copt=-Wextra
+build --copt=-pedantic
+build --config=clang
+
+# Address sanitizer
+build:asan --strip=never
+build:asan --copt -fsanitize=address
+build:asan --copt -DADDRESS_SANITIZER
+build:asan --copt -DDYNAMIC_ANNOTATIONS_ENABLED=1
+build:asan --copt -g
+build:asan --copt -fno-omit-frame-pointer
+build:asan --copt -fsanitize-address-use-after-scope
+build:asan --linkopt -fsanitize=address
+build:asan --dynamic_mode=off
+
+# Clang toolchan
+build:clang --crosstool_top=//toolchain:clang_suite
+build:clang --cpu=k8
+build:clang --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+build:clang --copt=-std=c++20
+
+###############################
+# Output                      #
+###############################
+
+# A more useful default output mode for bazel query
+# Prints eg. "ng_module rule //foo:bar" rather than just "//foo:bar"
+query --output=label_kind
+
+# Don't print every dependency in :node_modules, for example
+query --noimplicit_deps
+
+# By default, failing tests don't print any output, it goes to the log file
+test --test_output=errors
