@@ -34,7 +34,7 @@ public:
   List &operator=(const List &) = delete;
   List operator=(const List &&) noexcept = delete;
 
-  void Add(T data) {
+  void PushBack(T data) {
     if (head == nullptr) {
       head = tail = new Node(data);
     } else if (head == tail) {
@@ -48,6 +48,48 @@ public:
       tail->next = new_node;
       tail = new_node;
     }
+    ++size;
+  }
+
+  void PushFront(T data) {
+    if (head == nullptr) {
+      head = tail = new Node(data);
+    } else if (head == tail) {
+      auto *new_node = new Node(data);
+      head = new_node;
+      tail->prev = head;
+      head->next = tail;
+    } else {
+      auto *new_node = new Node(data);
+      new_node->next = head;
+      head->prev = new_node;
+      head = new_node;
+    }
+    ++size;
+  }
+
+  T PopBack() {
+    auto current = tail;
+    auto value = tail->data;
+    tail = tail->prev;
+    tail->next = nullptr;
+    delete current;
+    --size;
+    return value;
+  }
+
+  T PopFront() {
+    auto current = head;
+    auto value = head->data;
+    head = head->next;
+    head->prev = nullptr;
+    delete current;
+    --size;
+    return value;
+  }
+
+  size_t Size() const noexcept {
+    return size;
   }
 
   Iterator begin() const { return Iterator(head); }
@@ -80,6 +122,19 @@ public:
       return curr;
     }
 
+  // // Prefix for reverse iteration
+  //   Iterator operator--() {
+  //     base_node = base_node->prev;
+  //     return *this;
+  //   }
+
+  //   // Postfix
+  //   Iterator operator--(int) {
+  //     auto curr = *this;
+  //     base_node = base_node->prev;
+  //     return curr;
+  //   }
+
     friend bool operator==(const Iterator &lhs, const Iterator &rhs) noexcept {
       return lhs.base_node == rhs.base_node;
     }
@@ -93,5 +148,6 @@ public:
   };
   Node<T> *head{nullptr};
   Node<T> *tail{nullptr};
+  size_t size{0};
 };
 } // namespace ladida::structures
