@@ -12,13 +12,15 @@ int main() {
   l.PushBack(5);
   l.PushFront(0);
   l.PushFront(11);
+  l.PushBack(-11);
   for (const auto elem : l) {
     std::cout << elem << std::endl;
   }
   l.PopBack();
-  l.PopBack();
-  l.PopFront();
-  l.PopFront();
+  // l.PopBack();
+  // l.PopBack();
+  // l.PopFront();
+  // l.PopFront();
 
   std::cout << "After popping" << std::endl;
   for (const auto elem : l) {

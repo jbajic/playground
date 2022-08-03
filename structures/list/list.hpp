@@ -70,7 +70,7 @@ class List final {
     ++size;
   }
 
-  T PopBack() {
+  T PopFront() {
     auto *current = tail;
     auto value = tail->data;
     tail = tail->prev;
@@ -80,7 +80,7 @@ class List final {
     return value;
   }
 
-  T PopFront() {
+  T PopBack() {
     auto *current = head;
     auto value = head->data;
     head = head->next;
