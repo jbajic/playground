@@ -5,15 +5,17 @@
 
 namespace ladida::structures {
 
-template <typename T> struct Node {
+template <typename T>
+struct Node {
   Node(T data) : data{data} {}
   T data;
   Node *next{nullptr};
   Node *prev{nullptr};
 };
 
-template <typename T> class List final {
-public:
+template <typename T>
+class List final {
+ public:
   struct Iterator;
   List() = default;
 
@@ -21,11 +23,11 @@ public:
     if (head == nullptr) {
       return;
     }
-    Node<T> *current = head->next;
-    while (head != nullptr) {
-      delete head;
-      head = current;
-      current = head->next;
+    auto *current = head;
+    while (current != nullptr) {
+      head = current->next;
+      delete current;
+      current = head;
     }
   }
 
@@ -69,7 +71,7 @@ public:
   }
 
   T PopBack() {
-    auto current = tail;
+    auto *current = tail;
     auto value = tail->data;
     tail = tail->prev;
     tail->next = nullptr;
@@ -79,7 +81,7 @@ public:
   }
 
   T PopFront() {
-    auto current = head;
+    auto *current = head;
     auto value = head->data;
     head = head->next;
     head->prev = nullptr;
@@ -88,9 +90,7 @@ public:
     return value;
   }
 
-  size_t Size() const noexcept {
-    return size;
-  }
+  size_t Size() const noexcept { return size; }
 
   Iterator begin() const { return Iterator(head); }
 
@@ -122,18 +122,18 @@ public:
       return curr;
     }
 
-  // // Prefix for reverse iteration
-  //   Iterator operator--() {
-  //     base_node = base_node->prev;
-  //     return *this;
-  //   }
+    // // Prefix for reverse iteration
+    //   Iterator operator--() {
+    //     base_node = base_node->prev;
+    //     return *this;
+    //   }
 
-  //   // Postfix
-  //   Iterator operator--(int) {
-  //     auto curr = *this;
-  //     base_node = base_node->prev;
-  //     return curr;
-  //   }
+    //   // Postfix
+    //   Iterator operator--(int) {
+    //     auto curr = *this;
+    //     base_node = base_node->prev;
+    //     return curr;
+    //   }
 
     friend bool operator==(const Iterator &lhs, const Iterator &rhs) noexcept {
       return lhs.base_node == rhs.base_node;
@@ -143,11 +143,11 @@ public:
       return lhs.base_node != rhs.base_node;
     }
 
-  private:
+   private:
     Node<T> *base_node;
   };
   Node<T> *head{nullptr};
   Node<T> *tail{nullptr};
   size_t size{0};
 };
-} // namespace ladida::structures
+}  // namespace ladida::structures
