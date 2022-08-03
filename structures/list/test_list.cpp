@@ -1,17 +1,35 @@
-#include "list.hpp"
-#include "structures/list/list.hpp"
-
 #include <gtest/gtest.h>
 
-TEST(List, CreateList) {
-    ASSERT_NO_THROladida::structures::List<int> l1;
-    ladida::structures::List<std::string> l2;
-    ladida::structures::List<int> l3;
+#include "structures/list/list.hpp"
+
+TEST(TestList, ListTestPush) {
+  EXPECT_TRUE(true);
+  {
+    ladida::structures::List<int> list;
+    EXPECT_NO_THROW(list.PushFront(1));
+    EXPECT_NO_THROW(list.PushFront(2));
+    EXPECT_NO_THROW(list.PushFront(3));
+  }
+  {
+    ladida::structures::List<int> list;
+    EXPECT_NO_THROW(list.PushBack(1));
+    EXPECT_NO_THROW(list.PushBack(2));
+    EXPECT_NO_THROW(list.PushBack(3));
+  }
 }
 
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  memgraph::logging::RedirectToStderr();
-  spdlog::set_level(spdlog::level::trace);
-  return RUN_ALL_TESTS();
+TEST(TestList, ListTestPushAndPop) {
+  EXPECT_TRUE(true);
+  {
+    ladida::structures::List<int> list;
+    list.PushFront(1);
+    EXPECT_NO_THROW(list.PushFront(2));
+    EXPECT_NO_THROW(list.PushFront(3));
+  }
+  {
+    ladida::structures::List<int> list;
+    EXPECT_NO_THROW(list.PushBack(1));
+    EXPECT_NO_THROW(list.PushBack(2));
+    EXPECT_NO_THROW(list.PushBack(3));
+  }
 }

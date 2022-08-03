@@ -14,3 +14,15 @@ cc_binary(
         "//structures/list:list"
     ]
 )
+
+cc_test (
+    name = "test_list",
+    srcs = [
+        "test_list.cpp",
+    ],
+    deps = [
+        "//structures/list:list",
+        "@gtest//:gtest",
+        "@gtest//:gtest_main",
+    ],
+)
