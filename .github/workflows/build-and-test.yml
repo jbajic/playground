@@ -24,11 +24,11 @@ jobs:
           clang-format-version: "12"
           check-path: "."
 
-
   build-and-test:
     runs-on: "ubuntu-latest"
     name: "Build everything and run tests"
     strategy:
+      fail-fast: false
       matrix:
         config: ["asan", "clang"]
     steps:
