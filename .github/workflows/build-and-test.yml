@@ -38,8 +38,8 @@ jobs:
       - name: Setup bazelisk
         uses: bazelbuild/setup-bazelisk@v2
 
-      - name: Build everything in ${matrix.config} config
-        run: bazel build --config=${matrix.config} //...
+      - name: Build everything in ${{ matrix.config }} config
+        run: bazel build --config=${{ matrix.config }} //...
 
       - name: Test everything
         run: bazel test //...
