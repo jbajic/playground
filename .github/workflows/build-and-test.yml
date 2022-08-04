@@ -1,0 +1,45 @@
+name: Build and Test
+concurrency:
+  group: ${{ github.head_ref || github.sha }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  format-check:
+    runs-on: "ubuntu-latest"
+    name: "Run style code checks"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run clang-format style check
+        uses: jidicula/clang-format-action@v4.8.0
+        with:
+          clang-format-version: "12"
+          check-path: "."
+
+
+  build-and-test:
+    runs-on: "ubuntu-latest"
+    name: "Build everything and run tests"
+    strategy:
+      matrix:
+        config: ["asan", "clang"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup bazelisk
+        uses: bazelbuild/setup-bazelisk@v2
+
+      - name: Build everything in ${matrix.config} config
+        run: bazel build --config=${matrix.config} //...
+
+      - name: Test everything
+        run: bazel test //...
