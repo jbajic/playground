@@ -17,6 +17,19 @@ template <typename T>
 class List final {
  public:
   struct Iterator;
+
+  using value_type = T;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
+  using reference = T &;
+  using const_reference = const T &;
+  using pointer = T *;
+  using const_pointer = const T *;
+  using iterator = Iterator;
+  using const_iterator = Iterator;
+  // using reverse_iterator = const Iterator;
+  // using const_reverse_iterator = const Iterator;
+
   List() = default;
 
   ~List() {
@@ -95,6 +108,10 @@ class List final {
   Iterator begin() const { return Iterator(head); }
 
   Iterator end() const { return Iterator(nullptr); }
+
+  const Iterator cbegin() const { return Iterator(head); }
+
+  const Iterator cend() const { return Iterator(nullptr); }
 
   struct Iterator final {
     using iterator_category = std::forward_iterator_tag;

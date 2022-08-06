@@ -1,34 +1,28 @@
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "structures/list/list.hpp"
 
+using testing::ElementsAre;
+
 TEST(TestList, ListTestPush) {
   {
-    static constexpr std::array expected_list{3, 2, 1};
     ladida::structures::List<int> list;
     EXPECT_NO_THROW(list.PushFront(1));
     EXPECT_NO_THROW(list.PushFront(2));
     EXPECT_NO_THROW(list.PushFront(3));
     EXPECT_EQ(list.Size(), 3);
-    size_t counter{0};
-    for (const auto &elem : list) {
-      EXPECT_EQ(elem, expected_list[counter++]);
-    }
+    EXPECT_THAT(list, ElementsAre(3, 2, 1));
   }
   {
-    static constexpr std::array expected_list{1, 2, 3};
     ladida::structures::List<int> list;
     EXPECT_NO_THROW(list.PushBack(1));
     EXPECT_NO_THROW(list.PushBack(2));
     EXPECT_NO_THROW(list.PushBack(3));
     EXPECT_EQ(list.Size(), 3);
-    size_t counter{0};
-    for (const auto &elem : list) {
-      EXPECT_EQ(elem, expected_list[counter++]);
-    }
+    EXPECT_THAT(list, ElementsAre(1, 2, 3));
   }
   {
-    static constexpr std::array expected_list{-1, 0, 1, 2, 3};
     ladida::structures::List<int> list;
     EXPECT_NO_THROW(list.PushBack(1));
     EXPECT_NO_THROW(list.PushBack(2));
@@ -36,10 +30,7 @@ TEST(TestList, ListTestPush) {
     EXPECT_NO_THROW(list.PushFront(0));
     EXPECT_NO_THROW(list.PushFront(-1));
     EXPECT_EQ(list.Size(), 5);
-    size_t counter{0};
-    for (const auto &elem : list) {
-      EXPECT_EQ(elem, expected_list[counter++]);
-    }
+    EXPECT_THAT(list, ElementsAre(-1, 0, 1, 2, 3));
   }
 }
 
