@@ -27,8 +27,8 @@ class List final {
   using const_pointer = const T *;
   using iterator = Iterator;
   using const_iterator = Iterator;
-  // using reverse_iterator = const Iterator;
-  // using const_reverse_iterator = const Iterator;
+  using reverse_iterator = std::reverse_iterator<iterator>;
+  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
   List() = default;
 
@@ -83,7 +83,7 @@ class List final {
     ++size;
   }
 
-  T PopFront() {
+  T PopBack() {
     auto *current = tail;
     auto value = tail->data;
     tail = tail->prev;
@@ -93,7 +93,7 @@ class List final {
     return value;
   }
 
-  T PopBack() {
+  T PopFront() {
     auto *current = head;
     auto value = head->data;
     head = head->next;
@@ -105,13 +105,21 @@ class List final {
 
   size_t Size() const noexcept { return size; }
 
-  Iterator begin() const { return Iterator(head); }
+  iterator begin() const { return Iterator(head); }
 
-  Iterator end() const { return Iterator(nullptr); }
+  iterator end() const { return Iterator(nullptr); }
 
-  const Iterator cbegin() const { return Iterator(head); }
+  const_iterator cbegin() const { return Iterator(head); }
 
-  const Iterator cend() const { return Iterator(nullptr); }
+  const_iterator cend() const { return Iterator(nullptr); }
+
+  reverse_iterator rbegin() const { return reverse_iterator(Iterator(tail)); }
+
+  reverse_iterator rend() const { return reverse_iterator(Iterator(nullptr)); }
+
+  const_reverse_iterator rcbegin() const { return reverse_iterator(cend()); }
+
+  const_reverse_iterator rcend() const { return reverse_iterator(cbegin()); }
 
   struct Iterator final {
     using iterator_category = std::forward_iterator_tag;
@@ -139,18 +147,20 @@ class List final {
       return curr;
     }
 
-    // // Prefix for reverse iteration
-    //   Iterator operator--() {
-    //     base_node = base_node->prev;
-    //     return *this;
-    //   }
+    // Prefix for reverse iteration
+    Iterator operator--() {
+      // std::cout << "prefix --\n";
+      base_node = base_node->prev;
+      return *this;
+    }
 
-    //   // Postfix
-    //   Iterator operator--(int) {
-    //     auto curr = *this;
-    //     base_node = base_node->prev;
-    //     return curr;
-    //   }
+    // Postfix
+    Iterator operator--(int) {
+      std::cout << "postfix --\n";
+      auto curr = *this;
+      base_node = base_node->prev;
+      return curr;
+    }
 
     friend bool operator==(const Iterator &lhs, const Iterator &rhs) noexcept {
       return lhs.base_node == rhs.base_node;
