@@ -26,8 +26,8 @@ std::string URLify(std::string str) {
 }
 
 int main() {
-    std::cout << URLify("abcdedfg") << std::endl;
-    std::cout << URLify("A B       C D    ") << std::endl;
-    std::cout << URLify("A B C D") << std::endl;
-    return 0;
+  std::cout << URLify("abcdedfg") << std::endl;
+  std::cout << URLify("A B       C D    ") << std::endl;
+  std::cout << URLify("A B C D") << std::endl;
+  return 0;
 }
