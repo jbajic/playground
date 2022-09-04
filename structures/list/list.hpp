@@ -15,9 +15,10 @@ struct Node {
 
 template <typename T>
 class List final {
- public:
+ private:
   struct Iterator;
 
+ public:
   using value_type = T;
   using size_type = std::size_t;
   using difference_type = std::ptrdiff_t;
@@ -27,20 +28,17 @@ class List final {
   using const_pointer = const T *;
   using iterator = Iterator;
   using const_iterator = Iterator;
-  using reverse_iterator = std::reverse_iterator<iterator>;
-  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+  using reverse_iterator = iterator;
+  using const_reverse_iterator = const_iterator;
 
   List() = default;
 
   ~List() {
-    if (head == nullptr) {
-      return;
-    }
-    auto *current = head;
+    auto *current = head_;
     while (current != nullptr) {
-      head = current->next;
+      head_ = current->next;
       delete current;
-      current = head;
+      current = head_;
     }
   }
 
@@ -50,131 +48,135 @@ class List final {
   List operator=(const List &&) noexcept = delete;
 
   void PushBack(T data) {
-    if (head == nullptr) {
-      head = tail = new Node(data);
-    } else if (head == tail) {
+    if (head_ == nullptr) {
+      head_ = tail_ = new Node(data);
+    } else if (head_ == tail_) {
       auto *new_node = new Node(data);
-      tail = new_node;
-      head->next = tail;
-      tail->prev = head;
+      tail_ = new_node;
+      head_->next = tail_;
+      tail_->prev = head_;
     } else {
       auto *new_node = new Node(data);
-      new_node->prev = tail;
-      tail->next = new_node;
-      tail = new_node;
+      new_node->prev = tail_;
+      tail_->next = new_node;
+      tail_ = new_node;
     }
-    ++size;
+    ++size_;
   }
 
   void PushFront(T data) {
-    if (head == nullptr) {
-      head = tail = new Node(data);
-    } else if (head == tail) {
+    if (head_ == nullptr) {
+      head_ = tail_ = new Node(data);
+    } else if (head_ == tail_) {
       auto *new_node = new Node(data);
-      head = new_node;
-      tail->prev = head;
-      head->next = tail;
+      head_ = new_node;
+      tail_->prev = head_;
+      head_->next = tail_;
     } else {
       auto *new_node = new Node(data);
-      new_node->next = head;
-      head->prev = new_node;
-      head = new_node;
+      new_node->next = head_;
+      head_->prev = new_node;
+      head_ = new_node;
     }
-    ++size;
+    ++size_;
   }
 
   T PopBack() {
-    auto *current = tail;
-    auto value = tail->data;
-    tail = tail->prev;
-    tail->next = nullptr;
+    auto *current = tail_;
+    auto value = tail_->data;
+    tail_ = tail_->prev;
+    tail_->next = nullptr;
     delete current;
-    --size;
+    --size_;
     return value;
   }
 
   T PopFront() {
-    auto *current = head;
-    auto value = head->data;
-    head = head->next;
-    head->prev = nullptr;
+    auto *current = head_;
+    auto value = head_->data;
+    head_ = head_->next;
+    head_->prev = nullptr;
     delete current;
-    --size;
+    --size_;
     return value;
   }
 
-  size_t Size() const noexcept { return size; }
+  size_t Size() const noexcept { return size_; }
 
-  iterator begin() const { return Iterator(head); }
+  iterator begin() const { return Iterator(head_); }
 
   iterator end() const { return Iterator(nullptr); }
 
-  const_iterator cbegin() const { return Iterator(head); }
+  const_iterator cbegin() const { return Iterator(begin()); }
 
-  const_iterator cend() const { return Iterator(nullptr); }
+  const_iterator cend() const { return Iterator(end()); }
 
-  reverse_iterator rbegin() const { return reverse_iterator(Iterator(tail)); }
+  reverse_iterator rbegin() const { return Iterator(tail_); }
 
-  reverse_iterator rend() const { return reverse_iterator(Iterator(nullptr)); }
+  reverse_iterator rend() const { return Iterator(nullptr); }
 
-  const_reverse_iterator rcbegin() const { return reverse_iterator(cend()); }
+  // const_reverse_iterator rcbegin() const { return reverse_iterator(cend()); }
 
-  const_reverse_iterator rcend() const { return reverse_iterator(cbegin()); }
+  // const_reverse_iterator rcend() const { return reverse_iterator(cbegin()); }
 
+ private:
   struct Iterator final {
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::bidirectional_iterator_tag;
     using difference_type = std::ptrdiff_t;
     using value_type = T;
     using pointer = T *;
     using reference = T &;
 
-    Iterator(Node<T> *base_node) : base_node{base_node} {}
+    Iterator(Node<T> *base_node) : node_{base_node} {}
 
-    reference operator*() { return base_node->data; }
+    reference operator*() { return node_->data; }
 
-    pointer operator->() { return &base_node->data; }
+    pointer operator->() { return &node_->data; }
 
     // Prefix
     Iterator operator++() {
-      base_node = base_node->next;
+      // std::cout << "prefix ++" << node_->data << "\n";
+      node_ = node_->next;
       return *this;
     }
 
     // Postfix
     Iterator operator++(int) {
       auto curr = *this;
-      base_node = base_node->next;
+      node_ = node_->next;
       return curr;
     }
 
     // Prefix for reverse iteration
     Iterator operator--() {
-      // std::cout << "prefix --\n";
-      base_node = base_node->prev;
+      // std::cout << "prefix --" << node_->data << "\n";
+      node_ = node_->prev;
       return *this;
     }
 
     // Postfix
     Iterator operator--(int) {
-      std::cout << "postfix --\n";
+      // std::cout << "postfix --\n";
       auto curr = *this;
-      base_node = base_node->prev;
+      node_ = node_->prev;
       return curr;
     }
 
     friend bool operator==(const Iterator &lhs, const Iterator &rhs) noexcept {
-      return lhs.base_node == rhs.base_node;
+      return lhs.node_ == rhs.node_;
     }
 
     friend bool operator!=(const Iterator &lhs, const Iterator &rhs) noexcept {
-      return lhs.base_node != rhs.base_node;
+      return lhs.node_ != rhs.node_;
     }
 
    private:
-    Node<T> *base_node;
+    Node<T> *node_;
   };
-  Node<T> *head{nullptr};
-  Node<T> *tail{nullptr};
-  size_t size{0};
+
+ public:
+  Node<T> *head_{nullptr};
+  Node<T> *tail_{nullptr};
+  size_t size_{0};
 };
 }  // namespace ladida::structures
