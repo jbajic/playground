@@ -5,29 +5,36 @@
 
 #include <iostream>
 #include <string>
+#include <unordered_map>
 
-bool IsPalindrome(std::string str1, std::string str2) {
-  if (str1.size() != str2.size()) {
-    return false;
-  }
-  int i = 0;
-  int j = str1.size() - 1;
-  while (i < str1.size()) {
-    if (str1[i] != str2[j]) {
-      return false;
+bool IsPalindromePermutation(std::string str) {
+  std::unordered_map<char, int> chars;
+  for (const auto elem : str) {
+    if (chars.contains(elem)) {
+      chars[elem] += 1;
+    } else {
+      chars[elem] = 1;
     }
-    ++i;
-    --j;
+  }
+  bool one_odd{false};
+  for (const auto [elem, count] : chars) {
+    if (count % 2 != 0) {
+      if (one_odd) {
+        return false;
+      }
+      one_odd = true;
+    }
   }
   return true;
 }
 
 int main() {
-  std::cout << IsPalindrome("abc", "cba") << std::endl;
-  std::cout << IsPalindrome("abc cba", "abc cba") << std::endl;
-  std::cout << IsPalindrome("abcde fghi", "ihgf edcba") << std::endl;
-  std::cout << IsPalindrome("abc", "bca") << std::endl;
-  std::cout << IsPalindrome("abcde fghi", "ihgf edcab") << std::endl;
+  std::cout << IsPalindromePermutation("aab") << std::endl;
+  std::cout << IsPalindromePermutation("aabb") << std::endl;
+  std::cout << IsPalindromePermutation("ccvvbbaas") << std::endl;
+  std::cout << IsPalindromePermutation("aabbccd") << std::endl;
+  std::cout << IsPalindromePermutation("aabc") << std::endl;
+  std::cout << IsPalindromePermutation("aabcbt") << std::endl;
 
   return 0;
 }
