@@ -25,3 +25,10 @@ cc_binary(
         "palindrome.cpp"
     ]
 )
+
+cc_binary(
+    name = "one_away",
+    srcs = [
+        "one_away.cpp"
+    ]
+)

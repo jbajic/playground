@@ -8,6 +8,7 @@
 #include <unordered_map>
 
 bool IsPalindromePermutation(std::string str) {
+  int count_odd{0};
   std::unordered_map<char, int> chars;
   for (const auto elem : str) {
     if (chars.contains(elem)) {
@@ -15,17 +16,13 @@ bool IsPalindromePermutation(std::string str) {
     } else {
       chars[elem] = 1;
     }
-  }
-  bool one_odd{false};
-  for (const auto [elem, count] : chars) {
-    if (count % 2 != 0) {
-      if (one_odd) {
-        return false;
-      }
-      one_odd = true;
+    if (chars[elem] % 2 == 0) {
+      count_odd -= 1;
+    } else {
+      count_odd += 1;
     }
   }
-  return true;
+  return count_odd <= 1;
 }
 
 int main() {
