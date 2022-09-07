@@ -32,3 +32,10 @@ cc_binary(
         "one_away.cpp"
     ]
 )
+
+cc_binary(
+    name = "string_compression",
+    srcs = [
+        "string_compression.cpp"
+    ]
+)
