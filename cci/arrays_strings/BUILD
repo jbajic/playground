@@ -39,3 +39,10 @@ cc_binary(
         "string_compression.cpp"
     ]
 )
+
+cc_binary(
+    name = "rotate_matrix",
+    srcs = [
+        "rotate_matrix.cpp"
+    ]
+)
