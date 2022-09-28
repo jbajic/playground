@@ -29,12 +29,12 @@
 template <size_t n>
 void RotateMatrix(int (&matrix)[n][n]) {
   static constexpr auto m{n - 1};
-  for(size_t i = 0; i < m; ++i) {
-    size_t temp = matrix[0][i]; //1
-    matrix[0][i] = matrix[m-i][0]; //2
-    matrix[m-i][0] = matrix[m][m-i];//3
-    matrix[m][m-i] = matrix[i][m];//4
-    matrix[i][m] = temp;          // 5
+  for (size_t i = 0; i < m; ++i) {
+    size_t temp = matrix[0][i];           // 1
+    matrix[0][i] = matrix[m - i][0];      // 2
+    matrix[m - i][0] = matrix[m][m - i];  // 3
+    matrix[m][m - i] = matrix[i][m];      // 4
+    matrix[i][m] = temp;                  // 5
   }
 }
 

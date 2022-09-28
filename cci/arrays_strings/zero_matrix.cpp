@@ -2,8 +2,8 @@
 // 0, its entire row and column are set to 0
 
 #include <iostream>
-#include <vector>
 #include <set>
+#include <vector>
 
 void ZerofiyRow(auto &matrix, int row, int column_size) {
   for (int i{0}; i < column_size; ++i) {
