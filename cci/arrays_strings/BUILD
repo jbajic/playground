@@ -46,3 +46,10 @@ cc_binary(
         "rotate_matrix.cpp"
     ]
 )
+
+cc_binary(
+    name = "zero_matrix",
+    srcs = [
+        "zero_matrix.cpp"
+    ]
+)
