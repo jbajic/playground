@@ -53,3 +53,10 @@ cc_binary(
         "zero_matrix.cpp"
     ]
 )
+
+cc_binary(
+    name = "string_rotation",
+    srcs = [
+        "string_rotation.cpp"
+    ]
+)
