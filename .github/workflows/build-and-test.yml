@@ -30,28 +30,36 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: ["asan", "clang"]
+        config: ["asan", "clang", "gcc"]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Set up Clang
+        if: ${{ matrix.config != 'gcc' }}
         uses: egor-tensin/setup-clang@v1
         with:
           version: 12
           platform: x64
 
+      - name: Set up GCC
+        if: ${{ matrix.config == 'gcc' }}
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 11
+          platform: x64
+
       - name: Setup bazelisk
         uses: bazelbuild/setup-bazelisk@v2
 
-      - name: Setup bazel cache
-        uses: actions/cache@v3
-        with:
-          path: "~/.cache/bazel"
-          key: bazel
+      # - name: Setup bazel cache
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: "~/.cache/bazel"
+      #     key: bazel
 
       - name: Build everything in ${{ matrix.config }} config
         run: bazel build --config=${{ matrix.config }} //...
 
       - name: Test everything
-        run: bazel test //...
+        run: bazel test --config=${{ matrix.config }} //...
