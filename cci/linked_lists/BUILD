@@ -7,3 +7,11 @@ cc_binary(
     name = "kth_element",
     srcs = ["kth_element.cpp"],
 )
+
+cc_binary(
+    name = "delete_middle",
+    srcs = ["delete_middle.cpp"],
+    deps = [
+        "//cci:utils",
+    ]
+)
