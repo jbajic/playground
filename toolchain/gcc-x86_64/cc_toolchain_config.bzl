@@ -8,17 +8,30 @@ load(
     "tool_path",
 )
 
-all_link_actions = [ # NEW
+all_link_actions = [
     ACTION_NAMES.cpp_link_executable,
     ACTION_NAMES.cpp_link_dynamic_library,
     ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+]
+
+all_compile_actions = [
+    ACTION_NAMES.assemble,
+    ACTION_NAMES.c_compile,
+    ACTION_NAMES.clif_match,
+    ACTION_NAMES.cpp_compile,
+    ACTION_NAMES.cpp_header_parsing,
+    ACTION_NAMES.cpp_module_codegen,
+    ACTION_NAMES.cpp_module_compile,
+    ACTION_NAMES.linkstamp_compile,
+    ACTION_NAMES.lto_backend,
+    ACTION_NAMES.preprocess_assemble,
 ]
 
 def _impl(ctx):
     tool_paths = [
         tool_path(
             name = "gcc",
-            path = "/usr/bin/clang-12",
+            path = "/usr/bin/gcc-11",
         ),
         tool_path(
             name = "ld",
@@ -71,17 +84,17 @@ def _impl(ctx):
 
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,
-        features = features, # NEW
+        features = features,
         cxx_builtin_include_directories = [
-            "/usr/lib/llvm-12/lib/clang/12.0.1/include",
+            "/usr/lib/gcc/x86_64-linux-gnu/11/include/",
             "/usr/include",
         ],
-        toolchain_identifier = "local",
+        toolchain_identifier = "gcc_x86_64_toolchain",
         host_system_name = "local",
         target_system_name = "local",
-        target_cpu = "k8",
+        target_cpu = "unknown",
         target_libc = "unknown",
-        compiler = "clang",
+        compiler = "gcc-11.2.0",
         abi_version = "unknown",
         abi_libc_version = "unknown",
         tool_paths = tool_paths,
