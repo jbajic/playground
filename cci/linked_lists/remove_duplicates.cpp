@@ -4,6 +4,18 @@
 #include <list>
 #include <map>
 
+// No temp buffer allowed
+void RemoveDuplicates2(std::list<int> &l) {
+  for(auto it = l.begin(); it != l.end(); ++it) {
+    for(auto it2 = std::next(it); it2 != l.end();) {
+      if(*it == *it2) {
+        it2 = l.erase(it2);
+      } else {
+        ++it2;
+      }
+    }
+  }
+}
 
 // Using map
 void RemoveDuplicates(std::list<int> &l) {
@@ -44,10 +56,15 @@ int main() {
   PrintList(l3);
   PrintList(l4);
 
-  RemoveDuplicates(l1);
-  RemoveDuplicates(l2);
-  RemoveDuplicates(l3);
-  RemoveDuplicates(l4);
+  // RemoveDuplicates(l1);
+  // RemoveDuplicates(l2);
+  // RemoveDuplicates(l3);
+  // RemoveDuplicates(l4);
+
+  RemoveDuplicates2(l1);
+  RemoveDuplicates2(l2);
+  RemoveDuplicates2(l3);
+  RemoveDuplicates2(l4);
 
   std::cout << "After removing duplicates:" << std::endl;
   PrintList(l1);
