@@ -22,10 +22,10 @@ cc_binary(
     ]
 )
 
-# cc_binary(
-#     name = "partition",
-#     srcs = ["partition.cpp"],
-#     deps = [
-#         "//cci:utils",
-#     ]
-# )
+cc_binary(
+    name = "partition",
+    srcs = ["partition.cpp"],
+    deps = [
+        "//cci:utils",
+    ]
+)
