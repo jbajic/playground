@@ -4,6 +4,8 @@
 #include <list>
 #include <map>
 
+#include "cci/utils.hpp"
+
 // No temp buffer allowed
 void RemoveDuplicates2(std::list<int> &l) {
   for (auto it = l.begin(); it != l.end(); ++it) {
@@ -37,13 +39,6 @@ void RemoveDuplicates(std::list<int> &l) {
   }
 }
 
-void PrintList(std::list<int> &l) {
-  for (const auto &elem : l) {
-    std::cout << elem << ", ";
-  }
-  std::cout << std::endl;
-}
-
 int main() {
   std::list<int> l1{1, 2, 3};
   std::list<int> l2{1, 2, 3, 4, 5, 6};
@@ -51,10 +46,10 @@ int main() {
   std::list<int> l4{1, 2, 1, 3, 4, 2, 5, 6, 3, 1, 3};
 
   std::cout << "Before removing duplicates:" << std::endl;
-  PrintList(l1);
-  PrintList(l2);
-  PrintList(l3);
-  PrintList(l4);
+  PrintContainer(l1);
+  PrintContainer(l2);
+  PrintContainer(l3);
+  PrintContainer(l4);
 
   // RemoveDuplicates(l1);
   // RemoveDuplicates(l2);
@@ -67,9 +62,9 @@ int main() {
   RemoveDuplicates2(l4);
 
   std::cout << "After removing duplicates:" << std::endl;
-  PrintList(l1);
-  PrintList(l2);
-  PrintList(l3);
-  PrintList(l4);
+  PrintContainer(l1);
+  PrintContainer(l2);
+  PrintContainer(l3);
+  PrintContainer(l4);
   return 0;
 }

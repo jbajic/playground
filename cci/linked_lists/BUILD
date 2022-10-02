@@ -1,11 +1,17 @@
 cc_binary(
     name = "remove_duplicates",
     srcs = ["remove_duplicates.cpp"],
+    deps = [
+        "//cci:utils",
+    ]
 )
 
 cc_binary(
     name = "kth_element",
     srcs = ["kth_element.cpp"],
+    deps = [
+        "//cci:utils",
+    ]
 )
 
 cc_binary(
@@ -15,3 +21,11 @@ cc_binary(
         "//cci:utils",
     ]
 )
+
+# cc_binary(
+#     name = "partition",
+#     srcs = ["partition.cpp"],
+#     deps = [
+#         "//cci:utils",
+#     ]
+# )
