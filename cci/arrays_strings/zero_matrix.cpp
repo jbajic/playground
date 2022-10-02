@@ -20,8 +20,8 @@ void ZerofiyColumn(auto &matrix, int column, int row_size) {
 void ZerofyMatrix(std::vector<std::vector<int>> &matrix) {
   std::set<int> rows;
   std::set<int> columns;
-  for (int i{0}; i < matrix.size(); ++i) {
-    for (int j{0}; j < matrix[i].size(); ++j) {
+  for (size_t i{0}; i < matrix.size(); ++i) {
+    for (size_t j{0}; j < matrix[i].size(); ++j) {
       if (!rows.contains(i) && !columns.contains(j) && matrix[i][j] == 0) {
         ZerofiyRow(matrix, i, matrix[0].size());
         ZerofiyColumn(matrix, j, matrix.size());
