@@ -6,9 +6,9 @@
 
 // No temp buffer allowed
 void RemoveDuplicates2(std::list<int> &l) {
-  for(auto it = l.begin(); it != l.end(); ++it) {
-    for(auto it2 = std::next(it); it2 != l.end();) {
-      if(*it == *it2) {
+  for (auto it = l.begin(); it != l.end(); ++it) {
+    for (auto it2 = std::next(it); it2 != l.end();) {
+      if (*it == *it2) {
         it2 = l.erase(it2);
       } else {
         ++it2;
@@ -19,22 +19,22 @@ void RemoveDuplicates2(std::list<int> &l) {
 
 // Using map
 void RemoveDuplicates(std::list<int> &l) {
-    std::map<int, int> elems;
-    for(const auto &elem: l) {
-        if(elems.contains(elem)) {
-            elems[elem]++;
-        } else {
-          elems[elem] = 1;
-        }
+  std::map<int, int> elems;
+  for (const auto &elem : l) {
+    if (elems.contains(elem)) {
+      elems[elem]++;
+    } else {
+      elems[elem] = 1;
     }
-    for(auto it = l.begin(); it != l.end();) {
-        if(elems[*it] > 1) {
-            elems[*it] -= 1;
-            it = l.erase(it);
-        } else {
-          ++it;
-        }
+  }
+  for (auto it = l.begin(); it != l.end();) {
+    if (elems[*it] > 1) {
+      elems[*it] -= 1;
+      it = l.erase(it);
+    } else {
+      ++it;
     }
+  }
 }
 
 void PrintList(std::list<int> &l) {
