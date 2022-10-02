@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: ["asan", "clang"]
+        config: ["asan", "clang", "gcc"]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
