@@ -35,7 +35,7 @@ def _impl(ctx):
         ),
         tool_path(
             name = "ld",
-            path = "/usr/bin/ld",
+            path = "/usr/bin/ldd",
         ),
         tool_path(
             name = "ar",
