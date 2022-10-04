@@ -29,3 +29,11 @@ cc_binary(
         "//cci:utils",
     ]
 )
+
+cc_binary(
+    name = "sum_lists",
+    srcs = ["sum_lists.cpp"],
+    deps = [
+        "//cci:utils",
+    ]
+)
