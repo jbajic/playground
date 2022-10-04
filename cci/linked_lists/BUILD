@@ -37,3 +37,11 @@ cc_binary(
         "//cci:utils",
     ]
 )
+
+cc_binary(
+    name = "palindrome",
+    srcs = ["palindrome.cpp"],
+    deps = [
+        "//cci:utils",
+    ]
+)
