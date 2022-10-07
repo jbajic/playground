@@ -3,7 +3,7 @@ cc_binary(
     srcs = ["remove_duplicates.cpp"],
     deps = [
         "//cci:utils",
-    ]
+    ],
 )
 
 cc_binary(
@@ -11,7 +11,7 @@ cc_binary(
     srcs = ["kth_element.cpp"],
     deps = [
         "//cci:utils",
-    ]
+    ],
 )
 
 cc_binary(
@@ -19,7 +19,7 @@ cc_binary(
     srcs = ["delete_middle.cpp"],
     deps = [
         "//cci:utils",
-    ]
+    ],
 )
 
 cc_binary(
@@ -27,7 +27,7 @@ cc_binary(
     srcs = ["partition.cpp"],
     deps = [
         "//cci:utils",
-    ]
+    ],
 )
 
 cc_binary(
@@ -35,7 +35,7 @@ cc_binary(
     srcs = ["sum_lists.cpp"],
     deps = [
         "//cci:utils",
-    ]
+    ],
 )
 
 cc_binary(
@@ -43,5 +43,10 @@ cc_binary(
     srcs = ["palindrome.cpp"],
     deps = [
         "//cci:utils",
-    ]
+    ],
+)
+
+cc_binary(
+    name = "intersection",
+    srcs = ["intersection.cpp"],
 )
