@@ -50,3 +50,8 @@ cc_binary(
     name = "intersection",
     srcs = ["intersection.cpp"],
 )
+
+cc_binary(
+    name = "loop",
+    srcs = ["loop.cpp"],
+)

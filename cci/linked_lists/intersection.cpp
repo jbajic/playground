@@ -3,11 +3,11 @@
 // reference, not value.That is, if the kth node of the first linked list is the
 // exact same node (by reference) as the jth node of the second linked list,
 // then they are intersecting.
+#include <functional>
 #include <iostream>
 #include <unordered_set>
-#include <functional>
 
-template<typename T>
+template <typename T>
 struct Node {
   Node(T data) : data{std::move(data)} {}
 
@@ -15,7 +15,7 @@ struct Node {
   Node<T>* next{nullptr};
 };
 
-template<typename T>
+template <typename T>
 void PushFront(Node<T>** head, T data) {
   Node<T>* new_node = new Node<T>(std::move(data));
   new_node->next = *head;
@@ -28,8 +28,8 @@ void PrintSinglyLinkedList(Node<T>* head) {
   while (current != nullptr) {
     std::cout << current->data << ", ";
     current = current->next;
-    }
-    std::cout << std::endl;
+  }
+  std::cout << std::endl;
 }
 
 // Keep a set of all encountered node pointers
@@ -37,21 +37,20 @@ template <typename T>
 Node<T>* FindIntersection(Node<T>* head1, Node<T>* head2) {
   std::unordered_set<Node<T>*> nodes;
   auto current_node = head1;
-  while(current_node != nullptr) {
+  while (current_node != nullptr) {
     nodes.insert(current_node);
     current_node = current_node->next;
   }
 
   current_node = head2;
-  while(current_node != nullptr) {
-    if(const auto it = nodes.find(current_node); it != nodes.end()) {
-        return *it;
+  while (current_node != nullptr) {
+    if (const auto it = nodes.find(current_node); it != nodes.end()) {
+      return *it;
     }
     current_node = current_node->next;
   }
   return nullptr;
 }
-
 
 // Keep a set of all encountered node pointers
 template <typename T>
@@ -60,14 +59,14 @@ Node<T>* FindIntersection2(Node<T>* head1, Node<T>* head2) {
   // bother lists must ha ve the same end node
   auto end_node1 = head1;
   size_t list_1{0};
-  while(end_node1 != nullptr) {
+  while (end_node1 != nullptr) {
     end_node1 = end_node1->next;
     ++list_1;
   }
 
   auto end_node2 = head2;
   size_t list_2{0};
-  while(end_node2 != nullptr) {
+  while (end_node2 != nullptr) {
     end_node2 = end_node2->next;
     ++list_2;
   }
@@ -81,17 +80,17 @@ Node<T>* FindIntersection2(Node<T>* head1, Node<T>* head2) {
 
   // If one is longer then other we set the longer list at the same starting
   // position as shorter list
-  if(list_1 > list_2) {
-    for(size_t i{0}; i < list_1 - list_2; ++i) {
+  if (list_1 > list_2) {
+    for (size_t i{0}; i < list_1 - list_2; ++i) {
       current_node_1 = current_node_1->next;
     }
-  } else if(list_1 < list_2) {
-    for(size_t i{0}; i < list_2 - list_1; ++i) {
+  } else if (list_1 < list_2) {
+    for (size_t i{0}; i < list_2 - list_1; ++i) {
       current_node_2 = current_node_2->next;
     }
   }
-  while(current_node_1 != nullptr) {
-    if(current_node_1 == current_node_2) {
+  while (current_node_1 != nullptr) {
+    if (current_node_1 == current_node_2) {
       break;
     }
     current_node_1 = current_node_1->next;
