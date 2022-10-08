@@ -1,4 +1,3 @@
-
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 load(
     "@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl",
@@ -63,7 +62,8 @@ def _impl(ctx):
         ),
     ]
 
-    features = [ # NEW
+    features = [
+        # NEW
         feature(
             name = "default_linker_flags",
             enabled = True,
