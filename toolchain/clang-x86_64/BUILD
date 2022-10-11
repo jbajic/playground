@@ -1,12 +1,11 @@
 package(default_visibility = ["//visibility:public"])
+
 load(":cc_toolchain_config.bzl", "cc_toolchain_config")
 
 cc_toolchain_config(name = "clang_x86_64_toolchain_config")
 
 cc_toolchain(
     name = "clang_x86_64_toolchain",
-    toolchain_identifier = "clang_x86_64_toolchain",
-    toolchain_config = ":clang_x86_64_toolchain_config",
     all_files = ":clang_x86_64_toolchain_config",
     compiler_files = ":clang_x86_64_toolchain_config",
     dwp_files = ":clang_x86_64_toolchain_config",
@@ -14,6 +13,8 @@ cc_toolchain(
     objcopy_files = ":clang_x86_64_toolchain_config",
     strip_files = ":clang_x86_64_toolchain_config",
     supports_param_files = 0,
+    toolchain_config = ":clang_x86_64_toolchain_config",
+    toolchain_identifier = "clang_x86_64_toolchain",
 )
 
 cc_toolchain_suite(

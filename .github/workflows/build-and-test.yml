@@ -18,6 +18,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup buildifier
+        uses: jbajic/setup-buildifier-action@v1
+
+      - name: Run buildifier
+        run: |
+          buildifier -mode check -r .
+
       - name: Run clang-format style check
         uses: jidicula/clang-format-action@v4.8.0
         with:
