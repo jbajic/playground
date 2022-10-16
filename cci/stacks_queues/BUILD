@@ -17,3 +17,8 @@ cc_binary(
     name = "sort_stack",
     srcs = ["sort_stack.cpp"],
 )
+
+cc_binary(
+    name = "animal_shelter",
+    srcs = ["animal_shelter.cpp"],
+)
