@@ -68,32 +68,32 @@ class Queue {
       s2.Push(s1.Peak());
       s1.Pop();
     }
-}
+  }
 
   Stack<T, n> s1;
   Stack<T, n> s2;
 };
 
 int main() {
-    Queue<int, 10> q;
+  Queue<int, 10> q;
 
-    q.Push(1);
-    std::cout << "Peak: " << q.Peak() << std::endl;
-    q.Pop();
+  q.Push(1);
+  std::cout << "Peak: " << q.Peak() << std::endl;
+  q.Pop();
 
-    q.Push(2);
-    std::cout << "Peak: " << q.Peak() << std::endl;
-    q.Pop();
+  q.Push(2);
+  std::cout << "Peak: " << q.Peak() << std::endl;
+  q.Pop();
 
-    q.Push(3);
-    q.Push(4);
-    q.Push(5);
-    q.Push(6);
-    std::cout << "Peak: " << q.Peak() << std::endl;
-    q.Pop();
-    q.Pop();
-    q.Pop();
-    std::cout << "Peak: " << q.Peak() << std::endl;
+  q.Push(3);
+  q.Push(4);
+  q.Push(5);
+  q.Push(6);
+  std::cout << "Peak: " << q.Peak() << std::endl;
+  q.Pop();
+  q.Pop();
+  q.Pop();
+  std::cout << "Peak: " << q.Peak() << std::endl;
 
-    return 0;
+  return 0;
 }

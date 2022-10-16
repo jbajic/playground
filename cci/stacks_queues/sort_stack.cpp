@@ -107,7 +107,7 @@ class Stack {
   size_t size{0};
 };
 
-  int main() {
+int main() {
   std::cout << "Hello World!" << std::endl;
   Stack<int, 10> stack;
   stack.Push(5);

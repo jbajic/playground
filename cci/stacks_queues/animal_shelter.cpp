@@ -70,15 +70,11 @@ int main() {
   shelter.Enqueue(Cat{"Katzi"});
   shelter.Enqueue(Dog{"Dogso"});
 
-
-  std::visit([](const auto animal){
-    std::cout << animal.name << std::endl;
-  }, shelter.Dequeue());
-  std::visit([](const auto animal){
-    std::cout << animal.name << std::endl;
-  }, shelter.Dequeue());
-  std::visit([](const auto animal){
-    std::cout << animal.name << std::endl;
-  }, shelter.Dequeue());
+  std::visit([](const auto animal) { std::cout << animal.name << std::endl; },
+             shelter.Dequeue());
+  std::visit([](const auto animal) { std::cout << animal.name << std::endl; },
+             shelter.Dequeue());
+  std::visit([](const auto animal) { std::cout << animal.name << std::endl; },
+             shelter.Dequeue());
   return 0;
 }
