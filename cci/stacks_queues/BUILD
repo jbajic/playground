@@ -12,3 +12,8 @@ cc_binary(
     name = "queue_via_stack",
     srcs = ["queue_via_stack.cpp"],
 )
+
+cc_binary(
+    name = "sort_stack",
+    srcs = ["sort_stack.cpp"],
+)
