@@ -4,18 +4,10 @@
 
 #include <array>
 #include <cmath>
-#include <cstddef>
 #include <iostream>
 #include <list>
-#include <memory>
 
-template <typename T>
-struct Node {
-  Node(T data) : data{data} {}
-  T data;
-  Node<T>* left{nullptr};
-  Node<T>* right{nullptr};
-};
+#include "cci/trees_graphs/utils.hpp"
 
 template <typename T, size_t n>
 void AddNode(const std::array<T, n>& arr, const int64_t min, const int64_t max,
@@ -37,33 +29,6 @@ auto CreateBTS(const std::array<T, n> arr) {
   Node<T>* head{nullptr};
   AddNode(arr, 0, n, &head);
   return head;
-}
-
-bool IsInteger(float k) { return std::floor(k) == k; }
-
-template <typename T>
-void PrintBTS(Node<T>* node) {
-  std::list<Node<T>*> queue;
-  queue.push_back(node);
-  size_t counter{0};
-  while (!queue.empty()) {
-    const auto node = queue.front();
-    queue.pop_front();
-    ++counter;
-    if (counter != 1) {
-      if (IsInteger(std::log2(counter))) {
-        std::cout << std::endl;
-      }
-    }
-    std::cout << node->data << ", ";
-
-    if (node->left != nullptr) {
-      queue.push_back(node->left);
-    }
-    if (node->right != nullptr) {
-      queue.push_back(node->right);
-    }
-  }
 }
 
 int main() {

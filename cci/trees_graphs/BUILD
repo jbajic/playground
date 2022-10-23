@@ -1,3 +1,11 @@
+cc_library(
+    name = "utils",
+    srcs = ["utils.hpp"],
+    linkopts = [
+        "-lm"
+    ]
+)
+
 cc_binary(
     name = "route",
     srcs = ["route.cpp"],
@@ -6,7 +14,11 @@ cc_binary(
 cc_binary(
     name = "minimal_tree",
     srcs = ["minimal_tree.cpp"],
-    linkopts = [
-        "-lm"
-    ]
+    deps = [":utils"]
+)
+
+cc_binary(
+    name = "list_of_depths",
+    srcs = ["list_of_depths.cpp"],
+    deps = [":utils"]
 )
