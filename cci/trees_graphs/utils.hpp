@@ -10,7 +10,7 @@ struct Node {
   Node<T>* right{nullptr};
 };
 
-bool IsInteger(float k) { return std::floor(k) == k; }
+inline bool IsInteger(float k) { return std::floor(k) == k; }
 
 template <typename T>
 void PrintBTS(Node<T>* node) {
