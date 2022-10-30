@@ -28,3 +28,9 @@ cc_binary(
     srcs = ["check_balanced.cpp"],
     deps = [":utils"]
 )
+
+cc_binary(
+    name = "validate_bst",
+    srcs = ["validate_bst.cpp"],
+    deps = [":utils"]
+)
