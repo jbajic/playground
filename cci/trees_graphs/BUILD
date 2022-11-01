@@ -34,3 +34,8 @@ cc_binary(
     srcs = ["validate_bst.cpp"],
     deps = [":utils"]
 )
+
+cc_binary(
+    name = "successor",
+    srcs = ["successor.cpp"],
+)
