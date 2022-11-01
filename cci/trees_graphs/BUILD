@@ -39,3 +39,9 @@ cc_binary(
     name = "successor",
     srcs = ["successor.cpp"],
 )
+
+cc_binary(
+    name = "build_order",
+    srcs = ["build_order.cpp"],
+    deps = ["//cci:utils"],
+)
