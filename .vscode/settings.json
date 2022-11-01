@@ -1,0 +1,11 @@
+{
+    "C_Cpp.intelliSenseEngine": "Disabled",
+    "clangd.path": "/usr/bin/clangd-12",
+    "clangd.arguments": [
+        "-log=verbose",
+        "-pretty",
+        "--background-index",
+        //"--query-driver=/bin/arm-buildroot-linux-gnueabihf-g++", //for cross compile usage
+        "--compile-commands-dir=${workspaceFolder}"
+    ]
+}
