@@ -33,14 +33,7 @@ std::vector<char> GetBuildOrder(
       graph[project] = std::move(project_deps);
     }
   }
-  std::cout << "Graph: " << std::endl;
-  for (const auto &[f, s] : graph) {
-    std::cout << f << ": ";
-    for (const auto elem : s) {
-      std::cout << elem << ", ";
-    }
-    std::cout << std::endl;
-  }
+
   auto unfinished_projects = projects;
   std::vector<char> order;
   order.reserve(projects.size());

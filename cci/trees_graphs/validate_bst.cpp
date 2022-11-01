@@ -41,17 +41,17 @@ int main() {
   head.right = new Node<int64_t>(22);
   std::cout << std::boolalpha << ValidateBST(&head) << std::endl;
 
-    head.left->right = new Node<int64_t>(10);
-    head.left->left = new Node<int64_t>(5);
-    head.right->right = new Node<int64_t>(25);
-    head.right->left = new Node<int64_t>(20);
-    std::cout << std::boolalpha << ValidateBST(&head) << std::endl;
+  head.left->right = new Node<int64_t>(10);
+  head.left->left = new Node<int64_t>(5);
+  head.right->right = new Node<int64_t>(25);
+  head.right->left = new Node<int64_t>(20);
+  std::cout << std::boolalpha << ValidateBST(&head) << std::endl;
 
-    head.left->left->left = new Node<int64_t>(3);
-    std::cout << std::boolalpha << ValidateBST(&head) << std::endl;
+  head.left->left->left = new Node<int64_t>(3);
+  std::cout << std::boolalpha << ValidateBST(&head) << std::endl;
 
-    head.right->left->left = new Node<int64_t>(14);
-    std::cout << std::boolalpha << ValidateBST(&head) << std::endl;
+  head.right->left->left = new Node<int64_t>(14);
+  std::cout << std::boolalpha << ValidateBST(&head) << std::endl;
 
   return 0;
 }
