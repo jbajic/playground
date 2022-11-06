@@ -18,12 +18,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup buildifier
-        uses: jbajic/setup-buildifier@v1
-
       - name: Run buildifier
-        run: |
-          buildifier -mode check -r .
+        uses: jbajic/buildifier@v1
 
       - name: Run clang-format style check
         uses: jidicula/clang-format-action@v4.8.0
@@ -59,11 +55,11 @@ jobs:
       - name: Setup bazelisk
         uses: bazelbuild/setup-bazelisk@v2
 
-      # - name: Setup bazel cache
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: "~/.cache/bazel"
-      #     key: bazel
+      - name: Setup bazel cache
+        uses: actions/cache@v3
+        with:
+          path: "~/.cache/bazel"
+          key: bazel
 
       - name: Build everything in ${{ matrix.config }} config
         run: bazel build --config=${{ matrix.config }} //...
