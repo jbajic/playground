@@ -13,13 +13,84 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
+#include <iterator>
 #include <map>
+#include <stack>
+#include <unordered_map>
 #include <vector>
 
 #include "cci/utils.hpp"
 
-// Handles cyclic graphs as well
+enum class Visited : std::uint8_t { UNVISITED, TEMPORARY, PERMANENTLY };
+
+bool DFS(auto project, auto &graph, auto &order, auto &visited) {
+  if (visited[project] == Visited::PERMANENTLY) {
+    return true;
+  }
+  if (visited[project] == Visited::TEMPORARY) {
+    return false;
+  }
+  visited[project] = Visited::TEMPORARY;
+  for (const auto dep : graph[project]) {
+    if (!DFS(dep, graph, order, visited)) {
+      return false;
+    }
+  }
+  visited[project] = Visited::PERMANENTLY;
+  order.push_back(project);
+  return true;
+}
+
+// Handles cyclic graphs as well - DFS
+std::vector<char> GetBuildOrder3(
+    std::vector<char> projects,
+    std::vector<std::array<char, 2>> &dependencies) {
+  // Build deps graph
+  // Graph is built in a wat project -> [dep]
+  std::map<char, std::vector<char>> graph;
+  for (const auto &project : projects) {
+    std::vector<char> project_deps;
+    for (const auto &dep : dependencies) {
+      if (dep[1] == project) {
+        project_deps.push_back(dep[0]);
+      }
+    }
+    if (!project_deps.empty()) {
+      graph[project] = std::move(project_deps);
+    }
+  }
+
+  // Topological sort - DFS algo
+  std::vector<char> order;
+  order.reserve(projects.size());
+  std::unordered_map<char, Visited> visited;
+  std::stack<char> stack;
+  for (const auto &project : projects) {
+    visited[project] = Visited::UNVISITED;
+    stack.push(project);
+  }
+
+  while (!std::all_of(visited.begin(), visited.end(), [](const auto &elem) {
+    return elem.second == Visited::PERMANENTLY;
+  })) {
+    const auto it = std::find_if(projects.begin(), projects.end(),
+                                 [&visited](const auto elem) {
+                                   return visited[elem] != Visited::PERMANENTLY;
+                                 });
+    if (it == projects.end()) {
+      return {};
+    }
+    if (!DFS(*it, graph, order, visited)) {
+      return {};
+    }
+  }
+
+  return order;
+}
+
+// Handles cyclic graphs as well - Kahn
 std::vector<char> GetBuildOrder2(
     std::vector<char> projects,
     std::vector<std::array<char, 2>> &dependencies) {
@@ -40,22 +111,22 @@ std::vector<char> GetBuildOrder2(
 
   // Topological sort - Kahn algo
   std::vector<char> vertices_without_deps;
-  const auto fill_vertices_without_deps = [&vertices_without_deps, &projects,
-                                           &graph] {
-    for (const auto project : projects) {
-      if (!graph.contains(project)) {
-        vertices_without_deps.push_back(project);
-      }
+  // Fill with vertices without edges
+  for (const auto project : projects) {
+    if (!graph.contains(project)) {
+      vertices_without_deps.push_back(project);
     }
-  };
-  fill_vertices_without_deps();
+  }
 
   std::vector<char> order;
   order.reserve(projects.size());
   while (!vertices_without_deps.empty()) {
+    // Get first project without deps
     const auto project = vertices_without_deps.front();
     vertices_without_deps.erase(vertices_without_deps.begin());
     order.push_back(project);
+
+    // Remove the project as dependency and add projects without any
     for (auto it = graph.begin(); it != graph.end(); ++it) {
       if (auto found_dep = std::ranges::find(it->second, project);
           found_dep != it->second.end()) {
@@ -136,5 +207,9 @@ int main() {
   PrintContainer(order2);
   auto order3 = GetBuildOrder2(projects, dependencies_cycle);
   PrintContainer(order3);
+  auto order4 = GetBuildOrder3(projects, dependencies);
+  PrintContainer(order4);
+  auto order5 = GetBuildOrder3(projects, dependencies_cycle);
+  PrintContainer(order5);
   return 0;
 }
