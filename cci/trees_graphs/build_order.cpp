@@ -8,15 +8,72 @@
 //     projects:  a, b, c, d, e, f
 //     dependencies: (a, d), (f, b), (b, d), (f, a), (d, c)
 // Output: f, e, a, b, d, c
+// In order words to make `d` you have to make `a`
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <iostream>
 #include <map>
 #include <vector>
 
 #include "cci/utils.hpp"
 
+// Handles cyclic graphs as well
+std::vector<char> GetBuildOrder2(
+    std::vector<char> projects,
+    std::vector<std::array<char, 2>> &dependencies) {
+  // Build deps graph
+  // Graph is built in a wat project -> [dep]
+  std::map<char, std::vector<char>> graph;
+  for (const auto &project : projects) {
+    std::vector<char> project_deps;
+    for (const auto &dep : dependencies) {
+      if (dep[1] == project) {
+        project_deps.push_back(dep[0]);
+      }
+    }
+    if (!project_deps.empty()) {
+      graph[project] = std::move(project_deps);
+    }
+  }
+
+  // Topological sort - Kahn algo
+  std::vector<char> vertices_without_deps;
+  const auto fill_vertices_without_deps = [&vertices_without_deps, &projects,
+                                           &graph] {
+    for (const auto project : projects) {
+      if (!graph.contains(project)) {
+        vertices_without_deps.push_back(project);
+      }
+    }
+  };
+  fill_vertices_without_deps();
+
+  std::vector<char> order;
+  order.reserve(projects.size());
+  while (!vertices_without_deps.empty()) {
+    const auto project = vertices_without_deps.front();
+    vertices_without_deps.erase(vertices_without_deps.begin());
+    order.push_back(project);
+    for (auto it = graph.begin(); it != graph.end(); ++it) {
+      if (auto found_dep = std::ranges::find(it->second, project);
+          found_dep != it->second.end()) {
+        it->second.erase(found_dep);
+        if (it->second.empty()) {
+          vertices_without_deps.push_back(it->first);
+        }
+      }
+    }
+  }
+
+  if (order.size() == projects.size()) {
+    return order;
+  }
+  return {};
+}
+
+// Does not handle cyclic graphs
 std::vector<char> GetBuildOrder(
     std::vector<char> &projects,
     std::vector<std::array<char, 2>> &dependencies) {
@@ -36,11 +93,10 @@ std::vector<char> GetBuildOrder(
 
   auto unfinished_projects = projects;
   std::vector<char> order;
-  order.reserve(projects.size());
+  // order.reserve(projects.size());
   // Repeat until all projects are finished
   auto current_project_iterator{unfinished_projects.begin()};
   while (!unfinished_projects.empty()) {
-    std::cout << "Size: " << unfinished_projects.size() << std::endl;
     if (current_project_iterator == unfinished_projects.end()) {
       current_project_iterator = unfinished_projects.begin();
     }
@@ -71,7 +127,14 @@ int main() {
   std::vector<std::array<char, 2>> dependencies{
       {'a', 'd'}, {'f', 'b'}, {'b', 'd'}, {'f', 'a'}, {'d', 'c'}};
 
+  std::vector<std::array<char, 2>> dependencies_cycle{
+      {'a', 'd'}, {'f', 'b'}, {'b', 'd'}, {'f', 'a'}, {'d', 'c'}, {'a', 'f'}};
+
   auto order = GetBuildOrder(projects, dependencies);
   PrintContainer(order);
+  auto order2 = GetBuildOrder2(projects, dependencies);
+  PrintContainer(order2);
+  auto order3 = GetBuildOrder2(projects, dependencies_cycle);
+  PrintContainer(order3);
   return 0;
 }
