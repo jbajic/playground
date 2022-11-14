@@ -45,3 +45,9 @@ cc_binary(
     srcs = ["build_order.cpp"],
     deps = ["//cci:utils"],
 )
+
+cc_binary(
+    name = "first_common_ancestor",
+    srcs = ["first_common_ancestor.cpp"],
+    deps = [":utils"]
+)
