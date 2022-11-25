@@ -1,28 +1,28 @@
 cc_library(
     name = "list",
     srcs = [
-        "list.hpp"
-    ]
+        "list.hpp",
+    ],
 )
 
 cc_binary(
     name = "main",
     srcs = [
-        "main.cpp"
+        "main.cpp",
     ],
     deps = [
-        "//structures/list:list"
-    ]
+        "//structures/list",
+    ],
 )
 
-cc_test (
+cc_test(
     name = "test_list",
     srcs = [
         "test_list.cpp",
     ],
     deps = [
-        "//structures/list:list",
-        "@gtest//:gtest",
+        "//structures/list",
+        "@gtest",
         "@gtest//:gtest_main",
     ],
 )
