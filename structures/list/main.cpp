@@ -22,6 +22,10 @@ int main() {
   }
   std::cout << std::endl;
   std::cout << "Hello World!\n";
+  std::cout << "Before popping reverse iterator" << std::endl;
+  for (auto it = l.rbegin(); it != l.rend(); ++it) {
+    std::cout << *it << ", ";
+  }
   l.PopBack();
   l.PopBack();
 
@@ -38,13 +42,12 @@ int main() {
   std::cout << std::endl;
 
   std::cout << "After popping reverse iterator" << std::endl;
-  std::cout << l.tail_->data << std::endl;
   for (auto it = l.rbegin(); it != l.rend(); ++it) {
-    std::cout << *it << ", " << std::endl;
+    std::cout << *it << ", ";
   }
   std::cout << std::endl;
-  std::for_each(l.rbegin(), l.rend(), [](const int n) { std::cout << n << ' '; });
 
+  std::for_each(l.rbegin(), l.rend(), [](const int n) { std::cout << n << ' '; });
 
   return 0;
 }

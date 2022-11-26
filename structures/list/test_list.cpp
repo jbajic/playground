@@ -71,11 +71,51 @@ TEST(TestList, ListTestPushAndPop) {
 }
 
 TEST(TestList, ListTestIteration) {
+  std::array expected{1, 2, 3, 4};
   ladida::structures::List<int> list;
-  EXPECT_NO_THROW(list.PushBack(1));
-  EXPECT_NO_THROW(list.PushBack(2));
-  EXPECT_NO_THROW(list.PushBack(3));
-  EXPECT_NO_THROW(list.PushBack(4));
-  EXPECT_EQ(list.Size(), 4);
+  for (const auto elem : expected) {
+    EXPECT_NO_THROW(list.PushBack(elem));
+  }
+  EXPECT_EQ(list.Size(), expected.size());
   EXPECT_THAT(list, ElementsAre(1, 2, 3, 4));
+
+  {
+    size_t counter{0};
+    for (const auto elem : list) {
+      EXPECT_EQ(elem, expected[counter++]);
+    }
+    EXPECT_EQ(counter, expected.size());
+  }
+  {
+    size_t counter{0};
+    for (auto it = list.begin(); it != list.end(); ++it) {
+      EXPECT_EQ(*it, expected[counter++]);
+    }
+    EXPECT_EQ(counter, expected.size());
+  }
+}
+TEST(TestList, ListTestReverseIteration) {
+  std::array expected{1, 2, 3, 4};
+  ladida::structures::List<int> list;
+  for (const auto elem : expected) {
+    EXPECT_NO_THROW(list.PushBack(elem));
+  }
+  EXPECT_EQ(list.Size(), expected.size());
+  EXPECT_THAT(list, ElementsAre(1, 2, 3, 4));
+
+  // Test reverse iteration
+  {
+    size_t counter{expected.size() - 1};
+    for (auto it = list.rbegin(); it != list.rend(); ++it) {
+      EXPECT_EQ(*it, expected[counter--]);
+    }
+    EXPECT_EQ(counter, 0);
+  }
+  {
+    size_t counter{expected.size() - 1};
+    for (auto it = list.rbegin(); it != list.rend(); ++it) {
+      EXPECT_EQ(*it, expected[counter--]);
+    }
+    EXPECT_EQ(counter, 0);
+  }
 }

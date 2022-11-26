@@ -28,7 +28,7 @@ class List final {
   using const_pointer = const T *;
   using iterator = Iterator;
   using const_iterator = Iterator;
-  using reverse_iterator = iterator;
+  using reverse_iterator = std::reverse_iterator<iterator>;
   using const_reverse_iterator = const_iterator;
 
   List() = default;
@@ -41,11 +41,16 @@ class List final {
       current = head_;
     }
   }
-
   List(const List &) = delete;
   List(List &&) noexcept = delete;
   List &operator=(const List &) = delete;
   List operator=(const List &&) noexcept = delete;
+
+  constexpr T Front() const noexcept { return *head_; }
+
+  constexpr T Back() const noexcept { return *tail_; }
+
+  constexpr bool Empty() const noexcept { return size_ == 0; }
 
   void PushBack(T data) {
     if (head_ == nullptr) {
@@ -101,23 +106,31 @@ class List final {
     return value;
   }
 
-  size_t Size() const noexcept { return size_; }
+  constexpr size_type Size() const noexcept { return size_; }
 
-  iterator begin() const { return Iterator(head_); }
+  constexpr iterator begin() const { return Iterator(head_); }
 
-  iterator end() const { return Iterator(nullptr); }
+  constexpr iterator end() const { return Iterator(tail_); }
 
-  const_iterator cbegin() const { return Iterator(begin()); }
+  constexpr const_iterator cbegin() const { return Iterator(begin()); }
 
-  const_iterator cend() const { return Iterator(end()); }
+  constexpr const_iterator cend() const { return Iterator(end()); }
 
-  reverse_iterator rbegin() const { return Iterator(tail_); }
+  constexpr reverse_iterator rbegin() const {
+    return std::reverse_iterator(end());
+  }
 
-  reverse_iterator rend() const { return Iterator(nullptr); }
+  constexpr reverse_iterator rend() const {
+    return std::reverse_iterator(begin());
+  }
 
-  // const_reverse_iterator rcbegin() const { return reverse_iterator(cend()); }
+  // constexpr const_reverse_iterator crbegin() const {
+  //   return reverse_iterator(cend());
+  // }
 
-  // const_reverse_iterator rcend() const { return reverse_iterator(cbegin()); }
+  // constexpr const_reverse_iterator crend() const {
+  //   return reverse_iterator(cbegin());
+  // }
 
  private:
   struct Iterator final {
@@ -127,15 +140,14 @@ class List final {
     using pointer = T *;
     using reference = T &;
 
-    Iterator(Node<T> *base_node) : node_{base_node} {}
+    constexpr Iterator(Node<T> *base_node) : node_{base_node} {}
 
-    reference operator*() { return node_->data; }
+    value_type operator*() { return node_->data; }
 
     pointer operator->() { return &node_->data; }
 
     // Prefix
-    Iterator operator++() {
-      // std::cout << "prefix ++" << node_->data << "\n";
+    Iterator &operator++() {
       node_ = node_->next;
       return *this;
     }
@@ -148,15 +160,13 @@ class List final {
     }
 
     // Prefix for reverse iteration
-    Iterator operator--() {
-      // std::cout << "prefix --" << node_->data << "\n";
+    Iterator &operator--() {
       node_ = node_->prev;
       return *this;
     }
 
     // Postfix
     Iterator operator--(int) {
-      // std::cout << "postfix --\n";
       auto curr = *this;
       node_ = node_->prev;
       return curr;
@@ -174,7 +184,7 @@ class List final {
     Node<T> *node_;
   };
 
- public:
+ private:
   Node<T> *head_{nullptr};
   Node<T> *tail_{nullptr};
   size_t size_{0};
