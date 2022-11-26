@@ -68,6 +68,20 @@ TEST(TestList, ListTestPushAndPop) {
     EXPECT_EQ(list.Size(), 2);
     EXPECT_THAT(list, ElementsAre(2, 3));
   }
+  {
+    ladida::structures::List<int> list;
+    EXPECT_NO_THROW(list.PushBack(1));
+    EXPECT_NO_THROW(list.PushBack(2));
+    EXPECT_NO_THROW(list.PushFront(3));
+    EXPECT_NO_THROW(list.PushFront(4));
+    EXPECT_NO_THROW(list.PushFront(6));
+    EXPECT_NO_THROW(list.PushBack(7));
+
+    EXPECT_EQ(list.PopFront(), 6);
+    EXPECT_EQ(list.PopBack(), 7);
+    EXPECT_EQ(list.Size(), 4);
+    EXPECT_THAT(list, ElementsAre(4, 3, 1, 2));
+  }
 }
 
 TEST(TestList, ListTestIteration) {
