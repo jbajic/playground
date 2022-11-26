@@ -105,17 +105,21 @@ TEST(TestList, ListTestReverseIteration) {
 
   // Test reverse iteration
   {
-    size_t counter{expected.size() - 1};
+    size_t counter{0};
+    constexpr auto size{expected.size()};
     for (auto it = list.rbegin(); it != list.rend(); ++it) {
-      EXPECT_EQ(*it, expected[counter--]);
+      EXPECT_EQ(*it, expected[size - counter - 1]);
+      counter++;
     }
-    EXPECT_EQ(counter, 0);
+    EXPECT_EQ(counter, size);
   }
   {
-    size_t counter{expected.size() - 1};
+    size_t counter{0};
+    constexpr auto size{expected.size()};
     for (auto it = list.rbegin(); it != list.rend(); ++it) {
-      EXPECT_EQ(*it, expected[counter--]);
+      EXPECT_EQ(*it, expected[size - counter - 1]);
+      counter++;
     }
-    EXPECT_EQ(counter, 0);
+    EXPECT_EQ(counter, size);
   }
 }

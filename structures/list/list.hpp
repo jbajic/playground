@@ -1,5 +1,7 @@
 #pragma once
 
+#include <assert.h>
+
 #include <iostream>
 #include <iterator>
 
@@ -7,6 +9,7 @@ namespace ladida::structures {
 
 template <typename T>
 struct Node {
+  Node() = default;
   Node(T data) : data{data} {}
   T data;
   Node *next{nullptr};
@@ -46,35 +49,41 @@ class List final {
   List &operator=(const List &) = delete;
   List operator=(const List &&) noexcept = delete;
 
-  constexpr T Front() const noexcept { return *head_; }
+  constexpr T &Front() const { return *head_; }
 
-  constexpr T Back() const noexcept { return *tail_; }
+  constexpr T &Back() const { return *tail_->prev; }
 
   constexpr bool Empty() const noexcept { return size_ == 0; }
 
   void PushBack(T data) {
     if (head_ == nullptr) {
-      head_ = tail_ = new Node(data);
-    } else if (head_ == tail_) {
-      auto *new_node = new Node(data);
-      tail_ = new_node;
-      head_->next = tail_;
+      head_ = new Node(data);
+      if constexpr (!std::is_default_constructible_v<T>) {
+        tail_ = new Node(data);
+      } else {
+        tail_ = new Node<T>();
+      }
       tail_->prev = head_;
+      head_->next = tail_;
     } else {
       auto *new_node = new Node(data);
-      new_node->prev = tail_;
-      tail_->next = new_node;
-      tail_ = new_node;
+      new_node->prev = tail_->prev;
+      new_node->next = tail_;
+
+      tail_->prev->next = new_node;
+      tail_->prev = new_node;
     }
     ++size_;
   }
 
   void PushFront(T data) {
     if (head_ == nullptr) {
-      head_ = tail_ = new Node(data);
-    } else if (head_ == tail_) {
-      auto *new_node = new Node(data);
-      head_ = new_node;
+      head_ = new Node(data);
+      if constexpr (!std::is_default_constructible_v<T>) {
+        tail_ = new Node(data);
+      } else {
+        tail_ = new Node<T>();
+      }
       tail_->prev = head_;
       head_->next = tail_;
     } else {
@@ -87,16 +96,32 @@ class List final {
   }
 
   T PopBack() {
-    auto *current = tail_;
-    auto value = tail_->data;
-    tail_ = tail_->prev;
-    tail_->next = nullptr;
-    delete current;
+    assert(size_ != 0);
+    if (size_ == 1) {
+      auto val = head_->data;
+      delete head_;
+      --size_;
+      head_ = tail_ = nullptr;
+      return val;
+    }
+    auto *current = tail_->prev;
+    auto val = current->data;
+    tail_->prev = current->prev;
+    current->prev->next = tail_;
     --size_;
-    return value;
+    delete current;
+    return val;
   }
 
   T PopFront() {
+    assert(size_ != 0);
+    if (size_ == 1) {
+      auto val = head_->data;
+      delete head_;
+      --size_;
+      head_ = tail_ = nullptr;
+      return val;
+    }
     auto *current = head_;
     auto value = head_->data;
     head_ = head_->next;
@@ -124,13 +149,13 @@ class List final {
     return std::reverse_iterator(begin());
   }
 
-  // constexpr const_reverse_iterator crbegin() const {
-  //   return reverse_iterator(cend());
-  // }
+  constexpr const_reverse_iterator crbegin() const {
+    return reverse_iterator(cend());
+  }
 
-  // constexpr const_reverse_iterator crend() const {
-  //   return reverse_iterator(cbegin());
-  // }
+  constexpr const_reverse_iterator crend() const {
+    return reverse_iterator(cbegin());
+  }
 
  private:
   struct Iterator final {
