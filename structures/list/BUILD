@@ -26,3 +26,15 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "benchmark_list",
+    srcs = [
+        "benchmark_list.cpp",
+    ],
+    deps = [
+        "//structures/list",
+        "@google_benchmark//:benchmark_main",
+    ],
+    tags = ["benchmark", "ds"]
+)

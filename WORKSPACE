@@ -10,6 +10,14 @@ git_repository(
     shallow_since = "1583246693 -0500",
 )
 
+http_archive(
+    name = "google_benchmark",
+    sha256 = "aeec52381284ec3752505a220d36096954c869da4573c2e1df3642d2f0a4aac6",
+    strip_prefix = "benchmark-1.7.1",
+    urls = ["https://github.com/google/benchmark/archive/v1.7.1.zip"],
+)
+
+
 # Hedron's Compile Commands Extractor for Bazel
 # https://github.com/hedronvision/bazel-compile-commands-extractor
 http_archive(
