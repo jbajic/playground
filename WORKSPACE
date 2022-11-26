@@ -17,7 +17,6 @@ http_archive(
     urls = ["https://github.com/google/benchmark/archive/v1.7.1.zip"],
 )
 
-
 # Hedron's Compile Commands Extractor for Bazel
 # https://github.com/hedronvision/bazel-compile-commands-extractor
 http_archive(

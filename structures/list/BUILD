@@ -32,9 +32,13 @@ cc_test(
     srcs = [
         "benchmark_list.cpp",
     ],
+    linkopts = ["-lm"],
+    tags = [
+        "benchmark",
+        "ds",
+    ],
     deps = [
         "//structures/list",
         "@google_benchmark//:benchmark_main",
     ],
-    tags = ["benchmark", "ds"]
 )
