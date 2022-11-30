@@ -42,3 +42,43 @@ cc_test(
         "@google_benchmark//:benchmark_main",
     ],
 )
+
+cc_test(
+    name = "benchmark_list_insert",
+    srcs = [
+        "benchmark_list_insert.cpp",
+    ],
+    args = [
+        "--benchmark_out=benchmark_list_insert.json",
+        "--benchmark_out_format=json",
+    ],
+    linkopts = ["-lm"],
+    tags = [
+        "benchmark",
+        "ds",
+    ],
+    deps = [
+        "//structures/list",
+        "@google_benchmark//:benchmark_main",
+    ],
+)
+
+cc_test(
+    name = "benchmark_list_remove",
+    srcs = [
+        "benchmark_list_remove.cpp",
+    ],
+    args = [
+        "--benchmark_out=benchmark_list_remove.json",
+        "--benchmark_out_format=json",
+    ],
+    linkopts = ["-lm"],
+    tags = [
+        "benchmark",
+        "ds",
+    ],
+    deps = [
+        "//structures/list",
+        "@google_benchmark//:benchmark_main",
+    ],
+)

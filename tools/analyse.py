@@ -1,6 +1,6 @@
 import argparse
 import sys
-from collections import defaultdict
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Optional
@@ -8,7 +8,7 @@ from typing import Optional
 import matplotlib.pyplot as plt
 
 
-class Keywords(Enum):
+class Operation(Enum):
     CONTAINS = "contains"
     FIND = "find"
     INSERT = "insert"
@@ -21,80 +21,74 @@ class Keywords(Enum):
         return list(map(lambda c: c.value, cls))
 
 
-class BenchmarkRow:
-    def __init__(self, full_name: str, time: int, cpu: int, iterations: int):
-        name = full_name.split("BM_Benchmark")
-        assert len(name) == 2
-
-        category_and_run_arg = name[1].split("/")
-        self._name = category_and_run_arg[0]
-        self._run_arg = None
-        if len(category_and_run_arg) == 2:
-            self._run_arg = category_and_run_arg[1]
-
-        self._cpu = cpu
-        self._time = time
-        self._iterations = iterations
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def run_arg(self):
-        return self._run_arg
-
-    @property
-    def cpu(self):
-        return self._cpu
-
-    @property
-    def time(self):
-        return self._time
-
-    @property
-    def iterations(self):
-        return self._iterations
-
-    def __repr__(self) -> str:
-        return f"BenchmarkRow(name={self._name}, run_arg={self._run_arg}, cpu={self._cpu}, time={self._time}, iterations={self._iterations})"
+@dataclass(frozen=True)
+class DatastructureOperationRow:
+    name: str
+    category: Operation
+    real_time: int
+    cpu_time: int
+    iterations: int
+    datastructure: str
+    run_arg: Optional[str]
 
 
-class GoogleBenchmarkResult:
+class DatastructureResults:
     def __init__(self):
-        self._categories = {k: [] for k in Keywords.to_list()}
-        self._tests: dict[str, list[BenchmarkRow]] = defaultdict(list)
+        self._results: list[DatastructureOperationRow] = []
+        self._datastructure = None
 
-    def add_result(self, row: BenchmarkRow) -> None:
-        if row._name not in self._tests:
-            self._tests[row._name] = [row]
-        else:
-            self._tests[row._name].append(row)
-
-    @property
-    def tests(self):
-        return self._tests
+    def add_datastructure_result(self, row: DatastructureOperationRow) -> None:
+        if self._datastructure is None:
+            self._datastructure = row.datastructure
+        assert self._datastructure == row.datastructure
+        self._results.append(row)
 
     @property
-    def categories(self):
-        return self._categories
+    def results(self) -> list[DatastructureOperationRow]:
+        return self._results
 
-    def __repr__(self) -> str:
-        return f"{self._tests}"
-
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Process benchmark results.")
-    parser.add_argument("--log_file", type=str)
-    return parser.parse_args()
+    @property
+    def datastructure(self) -> str:
+        assert self._datastructure is not None
+        return self._datastructure
 
 
-def get_row_data(line: str) -> BenchmarkRow:
+class OperationResults:
+    def __init__(self):
+        self._results: dict[Operation, list[DatastructureResults]] = dict()
+        self._category = None
+
+    def results(self, category: Operation) -> list[DatastructureResults]:
+        return self._results[category]
+
+    @property
+    def category(self) -> Operation:
+        assert self._category is not None
+        return self._category
+
+
+def find_category(s: str) -> Operation:
+    for category in Operation.to_list():
+        if category in s.lower():
+            return Operation[category.upper()]
+    raise Exception(f"Category in {s} not found")
+
+
+def get_row_data(line: str) -> DatastructureOperationRow:
     splitted = line.split()
     assert len(splitted) == 6, f"Length is {len(splitted)}"
     assert splitted[2] == "ns"
     assert splitted[4] == "ns"
-    return BenchmarkRow(splitted[0], int(splitted[1]), int(splitted[3]), int(splitted[5]))
+
+    full_name = splitted[0].split("BM_Benchmark")
+    assert len(full_name) == 2
+    category_and_run_arg = full_name[1].split("/")
+    name = category_and_run_arg[0]
+
+    run_arg = None
+    if len(category_and_run_arg) == 2:
+        run_arg = category_and_run_arg[1]
+    return DatastructureOperationRow(name, find_category(name), splitted[1], splitted[3], splitted[5], run_arg)
 
 
 def get_benchmark_res(args) -> Optional[GoogleBenchmarkResult]:
@@ -110,14 +104,13 @@ def get_benchmark_res(args) -> Optional[GoogleBenchmarkResult]:
         return res
 
 
-def plot_res(results: GoogleBenchmarkResult) -> None:
+def plot_by_name(results: GoogleBenchmarkResult) -> None:
     for name, rows in results.tests.items():
         if len(rows) > 1:
             # Print line chart
             x_axis = [elem.run_arg for elem in rows]
             y_time = [elem.time for elem in rows]
             y_cpu = [elem.cpu for elem in rows]
-            y_iterations = [elem.iterations for elem in rows]
             plt.plot(x_axis, y_time, marker="", color="red", linewidth="2", label="time")
             plt.plot(x_axis, y_cpu, marker="", color="blue", linewidth="2", label="cpu")
             plt.title(f"Benchmark results {name}")
@@ -126,6 +119,29 @@ def plot_res(results: GoogleBenchmarkResult) -> None:
         else:
             print(f"Nothing to do for {name}...")
         plt.show()
+
+
+def plot_by_category(results: GoogleBenchmarkResult) -> None:
+    for category, rows in results.categories.items():
+        if len(rows) > 1:
+            # Print line chart
+            x_axis = [elem.run_arg for elem in rows]
+            y_time = [elem.time for elem in rows]
+            # y_cpu = [elem.cpu for elem in rows]
+            plt.plot(x_axis, y_time, marker="", color="red", linewidth="2", label="time")
+            # plt.plot(x_axis, y_cpu, marker="", color="blue", linewidth="2", label="cpu")
+            plt.title(f"Benchmark results {category}")
+            plt.xlabel("Number of elements tested")
+            plt.legend()
+        else:
+            print(f"Nothing to do for {name}...")
+        plt.show()
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Process benchmark results.")
+    parser.add_argument("--log_file", type=str)
+    return parser.parse_args()
 
 
 def main():

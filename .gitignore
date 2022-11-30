@@ -10,3 +10,8 @@ bazel_links*
 /compile_commands.json
 # Directory where clangd puts its indexing work
 /.cache/
+
+/**/.venv
+
+# Benchmark results
+benchmark_results/
