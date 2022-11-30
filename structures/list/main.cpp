@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 
 #include "structures/list/list.hpp"
 
@@ -11,20 +12,42 @@ int main() {
   l.PushBack(4);
   l.PushBack(5);
   l.PushFront(0);
-  l.PushFront(11);
-  l.PushBack(-11);
+  l.PushFront(-10);
+  l.PushFront(-11);
+  l.PushBack(6);
+  std::cout << "Hello World!\n";
+  std::cout << "Size:" << l.Size() << std::endl;
   for (const auto elem : l) {
-    std::cout << elem << std::endl;
+    std::cout << elem << ", ";
+  }
+  std::cout << std::endl;
+  std::cout << "Hello World!\n";
+  std::cout << "Before popping reverse iterator" << std::endl;
+  for (auto it = l.rbegin(); it != l.rend(); ++it) {
+    std::cout << *it << ", ";
   }
   l.PopBack();
-  // l.PopBack();
-  // l.PopBack();
-  // l.PopFront();
-  // l.PopFront();
+  l.PopBack();
 
   std::cout << "After popping" << std::endl;
   for (const auto elem : l) {
-    std::cout << elem << std::endl;
+    std::cout << elem << ", ";
   }
+  std::cout << std::endl;
+
+  std::cout << "After popping iterator" << std::endl;
+  for (auto it = l.begin(); it != l.end(); ++it) {
+    std::cout << *it << ", ";
+  }
+  std::cout << std::endl;
+
+  std::cout << "After popping reverse iterator" << std::endl;
+  for (auto it = l.rbegin(); it != l.rend(); ++it) {
+    std::cout << *it << ", ";
+  }
+  std::cout << std::endl;
+
+  std::for_each(l.rbegin(), l.rend(), [](const int n) { std::cout << n << ' '; });
+
   return 0;
 }
