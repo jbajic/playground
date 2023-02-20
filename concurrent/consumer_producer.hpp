@@ -1,4 +1,4 @@
-#include <conditional>
+#include <condition_variable>
 #include <mutex>
 #include <optional>
 #include <queue>
@@ -6,7 +6,7 @@
 template <typename T>
 class BufferWithMutex {
  public:
-  Buffer(size_t capacity) : capacity_{capacity} {}
+  BufferWithMutex(const size_t capacity) : capacity_{capacity} {}
 
   bool Add(const T &val) {
     const std::lock_guard<std::mutex> lock(data_mutex_);
@@ -18,7 +18,7 @@ class BufferWithMutex {
   }
 
   std::optional<T> Pop() {
-    std::lock_guard<std::mutex> lock(data_mutex_);
+    const std::lock_guard<std::mutex> lock(data_mutex_);
     if (!data_.empty()) {
       const auto val = data_.front();
       data_.pop();
@@ -34,31 +34,31 @@ class BufferWithMutex {
 };
 
 template <typename T>
-class BufferWithConditional {
+class BufferWithCondition {
  public:
-  Buffer(size_t capacity) : capacity_{capacity} {}
+  BufferWithCondition(const size_t capacity) : capacity_{capacity} {}
 
-  bool Add(const T &val) {
-    const std::lock_guard<std::mutex> lock(data_mutex_);
-    if (data_.size() < capacity_) {
-      data_.push(val);
-      return true;
-    }
-    return false;
+  void Add(const T &val) {
+    std::unique_lock<std::mutex> lock(data_mutex_);
+    not_full_.wait(lock, [this]() { return data_.size() < capacity_; });
+
+    data_.push(val);
+    not_empty_.notify_one();
   }
 
-  std::optional<T> Pop() {
-    std::lock_guard<std::mutex> lock(data_mutex_);
-    if (!data_.empty()) {
-      const auto val = data_.front();
-      data_.pop();
-      return val;
-    }
-    return std::nullopt;
+  T Pop() {
+    std::unique_lock<std::mutex> lock(data_mutex_);
+    not_empty_.wait(lock, [this]() { return !data_.empty(); });
+    const auto val = data_.front();
+    data_.pop();
+    not_full_.notify_one();
+    return val;
   }
 
  private:
   size_t capacity_;
   std::queue<T> data_;
   std::mutex data_mutex_;
+  std::condition_variable not_full_;
+  std::condition_variable not_empty_;
 };
