@@ -1,7 +1,7 @@
 cc_library(
     name = "consumer_producer",
     srcs = ["consumer_producer.hpp"],
-    linkopts = ["-lpthread"]
+    linkopts = ["-lpthread"],
 )
 
 cc_test(
