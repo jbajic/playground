@@ -13,3 +13,5 @@ bazel_links*
 
 # VsCode configuration
 .vscode
+
+*/**/.venv
