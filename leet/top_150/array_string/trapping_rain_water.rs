@@ -34,6 +34,8 @@ pub fn trap(height: Vec<i32>) -> i32 {
     trapped
 }
 
+// Also two pointers method can work
+
 fn main() {
     let height = Vec::from([0,1,0,2,1,0,1,3,2,1,2,1]);
     
