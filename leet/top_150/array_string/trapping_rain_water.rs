@@ -35,9 +35,39 @@ pub fn trap(height: Vec<i32>) -> i32 {
 }
 
 // Also two pointers method can work
+pub fn trap_2(height: Vec<i32>) -> i32 {
+    let mut left_index = 0;
+    let mut right_index = height.len() - 1;
+
+    let mut left_max = height[left_index];
+    let mut right_max = height[right_index];
+
+    let mut trapped = 0;
+    while left_index < right_index {
+        if left_max < right_max {
+            // Increment left index
+            left_index += 1; 
+            let res = left_max - height[left_index];
+            if res > 0 {
+                trapped += res;
+            }
+            left_max = std::cmp::max(height[left_index], left_max);
+        } else {
+            // Decrement right index
+            right_index -= 1; 
+            let res = right_max - height[right_index];
+            if res > 0 {
+                trapped += res;
+            }
+            right_max = std::cmp::max(height[right_index], right_max);
+        }
+    }
+
+    trapped
+}
 
 fn main() {
     let height = Vec::from([0,1,0,2,1,0,1,3,2,1,2,1]);
     
-    println!("Trapped water: {}", trap(height));
+    println!("Trapped water: {}", trap_2(height));
 }
