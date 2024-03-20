@@ -15,3 +15,7 @@ bazel_links*
 .vscode
 
 */**/.venv
+
+# For Rust
+**/target/
+**/debug/
