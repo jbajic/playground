@@ -7,23 +7,17 @@
 #include <thread>
 #include <vector>
 
-constexpr auto MAX_QUEUE_SIZE = 100;
 constexpr auto COUNTER_WORK = 100000;
 
+/// When the queue is unbounded it can be handled with single cond variable
+/// since we do not have to handle cases where queue is full or empty
 template <typename T>
-class LockedQueueSingleCond {
+class UnboundedQueue {
  public:
-  LockedQueueSingleCond(size_t capacity) : max_capacity(capacity) {
-    queue.reserve(capacity);
-  }
-
   void Append(T num) {
     std::cout << "Waiting to append" << std::endl;
     std::unique_lock<std::mutex> lock(mtx);
-    if (queue.size() < max_capacity) {
-      std::cout << "Appending " << num << std::endl;
-      queue.push_back(num);
-    }
+    queue.push_back(num);
     cond.notify_one();
     lock.unlock();
   }
@@ -53,7 +47,7 @@ int main() {
   producers.reserve(threads);
   std::vector<std::thread> consumers;
   consumers.reserve(threads);
-  LockedQueueSingleCond<int> queue(MAX_QUEUE_SIZE);
+  UnboundedQueue<int> queue;
 
   for (size_t i = 0; i < threads; ++i) {
     producers.emplace_back([&queue]() {
