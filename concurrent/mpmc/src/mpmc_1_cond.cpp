@@ -3,7 +3,6 @@
 #include <cstddef>
 #include <iostream>
 #include <mutex>
-#include <queue>
 #include <random>
 #include <thread>
 #include <vector>
@@ -14,24 +13,28 @@ constexpr auto COUNTER_WORK = 100000;
 template <typename T>
 class LockedQueueSingleCond {
  public:
-  LockedQueueSingleCond(size_t capacity) : max_capicity(capacity) {
+  LockedQueueSingleCond(size_t capacity) : max_capacity(capacity) {
     queue.reserve(capacity);
   }
 
   void Append(T num) {
+    std::cout << "Waiting to append" << std::endl;
     std::unique_lock<std::mutex> lock(mtx);
-    if (queue.size() < max_capicity) {
+    if (queue.size() < max_capacity) {
+      std::cout << "Appending " << num << std::endl;
       queue.push_back(num);
     }
-    lock.unlock();
     cond.notify_one();
+    lock.unlock();
   }
 
   int Pop() {
+    std::cout << "Waiting to pop" << std::endl;
     std::unique_lock<std::mutex> lock(mtx);
     cond.wait(lock, [&]() { return !queue.empty(); });
     auto elem = queue.back();
     queue.pop_back();
+    std::cout << "Popping " << elem << std::endl;
     return elem;
   }
 
@@ -39,7 +42,7 @@ class LockedQueueSingleCond {
   std::mutex mtx;
   std::condition_variable cond;
   std::vector<T> queue;
-  size_t max_capicity;
+  size_t max_capacity;
 };
 
 int main() {
@@ -65,6 +68,7 @@ int main() {
       }
     });
   }
+  std::cout << "Produces finished" << std::endl;
   for (size_t i = 0; i < threads; ++i) {
     consumers.emplace_back([&queue]() {
       auto counter = COUNTER_WORK;

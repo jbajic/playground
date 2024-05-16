@@ -2,7 +2,6 @@
 #include <cstddef>
 #include <iostream>
 #include <mutex>
-#include <queue>
 #include <random>
 #include <thread>
 #include <vector>

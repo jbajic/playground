@@ -8,7 +8,6 @@
 #include <thread>
 #include <vector>
 
-constexpr auto MAX_QUEUE_SIZE = 100;
 constexpr auto COUNTER_WORK = 100000;
 
 template <typename T>
@@ -97,7 +96,6 @@ static void BM_MultipleProducersMultipleConsumersMutex(
     std::vector<std::thread> consumers;
     consumers.reserve(threads);
     LockedQueue<int> queue(state.range(0));
-    queue.queue.reserve(MAX_QUEUE_SIZE);
 
     for (size_t i = 0; i < threads; ++i) {
       producers.emplace_back([&queue]() {
@@ -109,7 +107,7 @@ static void BM_MultipleProducersMultipleConsumersMutex(
         while (counter != 0) {
           {
             auto guard = std::lock_guard<std::mutex>(queue.mtx);
-            if (queue.queue.size() < MAX_QUEUE_SIZE) {
+            if (queue.queue.size() < queue.max_capacity) {
               auto num = uniform_dist(e1);
               queue.queue.push_back(num);
             }
