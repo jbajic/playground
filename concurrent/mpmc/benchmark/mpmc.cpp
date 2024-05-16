@@ -22,19 +22,13 @@ struct LockedQueue {
 };
 
 template <typename T>
-class LockedQueueSingleCond {
+class UnboundedQueue {
  public:
-  LockedQueueSingleCond(size_t capacity) : max_capicity(capacity) {
-    queue.reserve(capacity);
-  }
-
   void Append(T num) {
     std::unique_lock<std::mutex> lock(mtx);
-    if (queue.size() < max_capicity) {
-      queue.push_back(num);
-    }
-    lock.unlock();
+    queue.push_back(num);
     cond.notify_one();
+    lock.unlock();
   }
 
   int Pop() {
@@ -49,13 +43,14 @@ class LockedQueueSingleCond {
   std::mutex mtx;
   std::condition_variable cond;
   std::vector<T> queue;
-  size_t max_capicity;
+  size_t max_capacity;
 };
 
+
 template <typename T>
-class LockedQueueTwoCond {
+class BoundedQueue {
  public:
-  LockedQueueTwoCond(size_t capacity) : max_capicity(capacity) {
+  BoundedQueue(size_t capacity) : max_capicity(capacity) {
     queue.reserve(capacity);
   }
 
@@ -84,7 +79,7 @@ class LockedQueueTwoCond {
   size_t max_capicity;
 };
 
-static void BM_MultipleProducersMultipleConsumersMutex(
+static void BM_MPMC_BoundedMutex(
     benchmark::State &state) {
   size_t threads = std::thread::hardware_concurrency() / 2;
 
@@ -139,7 +134,7 @@ static void BM_MultipleProducersMultipleConsumersMutex(
   }
 }
 
-static void BM_MultipleProducersMultipleConsumersSingleCond(
+static void BM_MPMC_Unbounded(
     benchmark::State &state) {
   size_t threads = std::thread::hardware_concurrency() / 2;
   assert(threads % 2 == 0);
@@ -150,7 +145,7 @@ static void BM_MultipleProducersMultipleConsumersSingleCond(
     producers.reserve(threads);
     std::vector<std::thread> consumers;
     consumers.reserve(threads);
-    LockedQueueSingleCond<int> queue(state.range(0));
+    UnboundedQueue<int> queue;
 
     state.ResumeTiming();
     for (size_t i = 0; i < threads; ++i) {
@@ -186,7 +181,7 @@ static void BM_MultipleProducersMultipleConsumersSingleCond(
   }
 }
 
-static void BM_MultipleProducersMultipleConsumersTwoCond(
+static void BM_MPMC_Bounded(
     benchmark::State &state) {
   size_t threads = std::thread::hardware_concurrency() / 2;
   assert(threads % 2 == 0);
@@ -197,7 +192,7 @@ static void BM_MultipleProducersMultipleConsumersTwoCond(
     producers.reserve(threads);
     std::vector<std::thread> consumers;
     consumers.reserve(threads);
-    LockedQueueSingleCond<int> queue(state.range(0));
+    BoundedQueue<int> queue(state.range(0));
 
     state.ResumeTiming();
     for (size_t i = 0; i < threads; ++i) {
@@ -233,14 +228,15 @@ static void BM_MultipleProducersMultipleConsumersTwoCond(
   }
 }
 
-BENCHMARK(BM_MultipleProducersMultipleConsumersMutex)
+BENCHMARK(BM_MPMC_BoundedMutex)
     ->RangeMultiplier(10)
-    ->Range(10, 1000);
-BENCHMARK(BM_MultipleProducersMultipleConsumersSingleCond)
+    ->Range(10, 1000)->Unit(benchmark::kMillisecond);;
+
+BENCHMARK(BM_MPMC_Unbounded)->Unit(benchmark::kMillisecond);;
+
+BENCHMARK(BM_MPMC_Bounded)
     ->RangeMultiplier(10)
-    ->Range(10, 1000);
-BENCHMARK(BM_MultipleProducersMultipleConsumersTwoCond)
-    ->RangeMultiplier(10)
-    ->Range(10, 1000);
+    ->Range(10, 1000)
+    ->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();
