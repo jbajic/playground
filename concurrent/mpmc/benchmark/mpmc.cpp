@@ -230,13 +230,24 @@ static void BM_MPMC_Bounded(
 
 BENCHMARK(BM_MPMC_BoundedMutex)
     ->RangeMultiplier(10)
-    ->Range(10, 1000)->Unit(benchmark::kMillisecond);;
+    ->Range(10, 1000)->Unit(benchmark::kMillisecond);
 
-BENCHMARK(BM_MPMC_Unbounded)->Unit(benchmark::kMillisecond);;
+BENCHMARK(BM_MPMC_BoundedMutex)
+    ->RangeMultiplier(10)
+    ->Range(10, 1000)->Unit(benchmark::kMillisecond)
+    ->MeasureProcessCPUTime();
+
+BENCHMARK(BM_MPMC_Unbounded)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_MPMC_Unbounded)->Unit(benchmark::kMillisecond)->MeasureProcessCPUTime();
 
 BENCHMARK(BM_MPMC_Bounded)
     ->RangeMultiplier(10)
     ->Range(10, 1000)
     ->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_MPMC_Bounded)
+    ->RangeMultiplier(10)
+    ->Range(10, 1000)
+    ->Unit(benchmark::kMillisecond)
+    ->MeasureProcessCPUTime();
 
 BENCHMARK_MAIN();
