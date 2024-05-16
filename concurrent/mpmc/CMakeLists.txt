@@ -24,14 +24,24 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror \
   -Wextra --pedantic -Wold-style-cast \
   -Wwrite-strings")
 
+# Enable perf in benchmarking
+set(BENCHMARK_ENABLE_LIBPFM ON)
+
 # Pull any external libs
 include(FetchContent)
 FetchContent_Declare(
   googletest
-  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
 )
 FetchContent_MakeAvailable(googletest)
-find_package(benchmark REQUIRED)
+
+FetchContent_Declare(
+  benchmark
+  URL https://github.com/google/benchmark/archive/refs/tags/v1.8.3.zip
+)
+FetchContent_MakeAvailable(benchmark)
+
+#find_package(benchmark REQUIRED)
 
 # Add subprojects
 # Include dirs is for hdrs files, so it is easier to reference hdrs from root dir in project
