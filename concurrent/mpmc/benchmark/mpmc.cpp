@@ -11,16 +11,34 @@
 constexpr auto MAX_QUEUE_SIZE = 100;
 constexpr auto COUNTER_WORK = 100000;
 
-class LockedQueueCond {
+template <typename T>
+struct LockedQueue {
+  LockedQueue(size_t capacity) : max_capacity(capacity) {
+    queue.reserve(capacity);
+  }
+
+  std::mutex mtx;
+  std::vector<T> queue;
+  size_t max_capacity;
+};
+
+template <typename T>
+class LockedQueueSingleCond {
  public:
-  void append(int num) {
+  LockedQueueSingleCond(size_t capacity) : max_capicity(capacity) {
+    queue.reserve(capacity);
+  }
+
+  void Append(T num) {
     std::unique_lock<std::mutex> lock(mtx);
-    queue.push_back(num);
+    if (queue.size() < max_capicity) {
+      queue.push_back(num);
+    }
     lock.unlock();
     cond.notify_one();
   }
 
-  int pop() {
+  int Pop() {
     std::unique_lock<std::mutex> lock(mtx);
     cond.wait(lock, [&]() { return !queue.empty(); });
     auto elem = queue.back();
@@ -28,21 +46,48 @@ class LockedQueueCond {
     return elem;
   }
 
-  void reserve(size_t capacity) { queue.reserve(capacity); }
-
  private:
   std::mutex mtx;
   std::condition_variable cond;
-  std::vector<int> queue;
+  std::vector<T> queue;
+  size_t max_capicity;
+};
+
+template <typename T>
+class LockedQueueTwoCond {
+ public:
+  LockedQueueTwoCond(size_t capacity) : max_capicity(capacity) {
+    queue.reserve(capacity);
+  }
+
+  void Append(T num) {
+    std::unique_lock<std::mutex> lock(mtx);
+    no_full.wait(lock, [&]() { return queue.size() < max_capicity; });
+    queue.push_back(num);
+    lock.unlock();
+    no_empty.notify_one();
+  }
+
+  int Pop() {
+    std::unique_lock<std::mutex> lock(mtx);
+    no_empty.wait(lock, [&]() { return !queue.empty(); });
+    auto elem = queue.back();
+    queue.pop_back();
+    no_full.notify_one();
+    return elem;
+  }
+
+ private:
+  std::mutex mtx;
+  std::condition_variable no_empty;
+  std::condition_variable no_full;
+  std::vector<T> queue;
+  size_t max_capicity;
 };
 
 static void BM_MultipleProducersMultipleConsumersMutex(
     benchmark::State &state) {
   size_t threads = std::thread::hardware_concurrency() / 2;
-  struct LockedQueue {
-    std::mutex mtx;
-    std::vector<int> queue;
-  };
 
   assert(threads % 2 == 0);
 
@@ -51,7 +96,7 @@ static void BM_MultipleProducersMultipleConsumersMutex(
     producers.reserve(threads);
     std::vector<std::thread> consumers;
     consumers.reserve(threads);
-    LockedQueue queue;
+    LockedQueue<int> queue(state.range(0));
     queue.queue.reserve(MAX_QUEUE_SIZE);
 
     for (size_t i = 0; i < threads; ++i) {
@@ -96,7 +141,8 @@ static void BM_MultipleProducersMultipleConsumersMutex(
   }
 }
 
-static void BM_MultipleProducersMultipleConsumersCond(benchmark::State &state) {
+static void BM_MultipleProducersMultipleConsumersSingleCond(
+    benchmark::State &state) {
   size_t threads = std::thread::hardware_concurrency() / 2;
   assert(threads % 2 == 0);
 
@@ -106,8 +152,7 @@ static void BM_MultipleProducersMultipleConsumersCond(benchmark::State &state) {
     producers.reserve(threads);
     std::vector<std::thread> consumers;
     consumers.reserve(threads);
-    LockedQueueCond queue;
-    queue.reserve(MAX_QUEUE_SIZE);
+    LockedQueueSingleCond<int> queue(state.range(0));
 
     state.ResumeTiming();
     for (size_t i = 0; i < threads; ++i) {
@@ -118,7 +163,7 @@ static void BM_MultipleProducersMultipleConsumersCond(benchmark::State &state) {
 
         auto counter = COUNTER_WORK;
         while (counter != 0) {
-          queue.append(uniform_dist(e1));
+          queue.Append(uniform_dist(e1));
           counter--;
         }
       });
@@ -127,7 +172,7 @@ static void BM_MultipleProducersMultipleConsumersCond(benchmark::State &state) {
       consumers.emplace_back([&queue]() {
         auto counter = COUNTER_WORK;
         while (counter != 0) {
-          queue.pop();
+          queue.Pop();
           --counter;
         }
       });
@@ -143,7 +188,61 @@ static void BM_MultipleProducersMultipleConsumersCond(benchmark::State &state) {
   }
 }
 
-BENCHMARK(BM_MultipleProducersMultipleConsumersMutex);
-BENCHMARK(BM_MultipleProducersMultipleConsumersCond);
+static void BM_MultipleProducersMultipleConsumersTwoCond(
+    benchmark::State &state) {
+  size_t threads = std::thread::hardware_concurrency() / 2;
+  assert(threads % 2 == 0);
+
+  for (auto _ : state) {
+    state.PauseTiming();
+    std::vector<std::thread> producers;
+    producers.reserve(threads);
+    std::vector<std::thread> consumers;
+    consumers.reserve(threads);
+    LockedQueueSingleCond<int> queue(state.range(0));
+
+    state.ResumeTiming();
+    for (size_t i = 0; i < threads; ++i) {
+      producers.emplace_back([&queue]() {
+        std::random_device r;
+        std::default_random_engine e1(r());
+        std::uniform_int_distribution<int> uniform_dist(0, 1000);
+
+        auto counter = COUNTER_WORK;
+        while (counter != 0) {
+          queue.Append(uniform_dist(e1));
+          counter--;
+        }
+      });
+    }
+    for (size_t i = 0; i < threads; ++i) {
+      consumers.emplace_back([&queue]() {
+        auto counter = COUNTER_WORK;
+        while (counter != 0) {
+          queue.Pop();
+          --counter;
+        }
+      });
+    }
+
+    // Wrap up
+    for (auto &producer_thread : producers) {
+      producer_thread.join();
+    }
+    for (auto &consumer_thread : consumers) {
+      consumer_thread.join();
+    }
+  }
+}
+
+BENCHMARK(BM_MultipleProducersMultipleConsumersMutex)
+    ->RangeMultiplier(10)
+    ->Range(10, 1000);
+BENCHMARK(BM_MultipleProducersMultipleConsumersSingleCond)
+    ->RangeMultiplier(10)
+    ->Range(10, 1000);
+BENCHMARK(BM_MultipleProducersMultipleConsumersTwoCond)
+    ->RangeMultiplier(10)
+    ->Range(10, 1000);
 
 BENCHMARK_MAIN();
