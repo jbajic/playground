@@ -8,13 +8,13 @@
 #include <vector>
 
 constexpr auto MAX_QUEUE_SIZE = 100;
+constexpr auto COUNTER_WORK = 100000;
 
 int main() {
   size_t threads = std::thread::hardware_concurrency() / 2;
   struct LockedQueue {
     std::mutex mtx;
     std::vector<int> queue;
-    bool finished;
   };
 
   assert(threads % 2 == 0);
@@ -24,7 +24,6 @@ int main() {
   consumers.reserve(threads);
 
   LockedQueue queue;
-  queue.finished = false;
   queue.queue.reserve(MAX_QUEUE_SIZE);
 
   for (size_t i = 0; i < threads; ++i) {
@@ -33,7 +32,7 @@ int main() {
       std::default_random_engine e1(r());
       std::uniform_int_distribution<int> uniform_dist(0, 1000);
 
-      auto counter = 100000;
+      auto counter = COUNTER_WORK;
       while (counter != 0) {
         {
           auto guard = std::lock_guard<std::mutex>(queue.mtx);
@@ -42,23 +41,22 @@ int main() {
             std::cout << "Producer producing " << num << std::endl;
             queue.queue.push_back(num);
           }
-          counter--;
+          --counter;
         }
       }
     });
   }
   for (size_t i = 0; i < threads; ++i) {
     consumers.emplace_back([&queue]() {
-      while (true) {
-          auto guard = std::lock_guard<std::mutex>(queue.mtx);
-          if (!queue.queue.empty()) {
+      auto counter = COUNTER_WORK;
+      while (counter != 0) {
+        auto guard = std::lock_guard<std::mutex>(queue.mtx);
+        if (!queue.queue.empty()) {
           auto num = queue.queue.back();
           queue.queue.pop_back();
           std::cout << "Consumer consuming " << num << std::endl;
         }
-        if (queue.finished) {
-          return;
-        }
+        --counter;
       }
     });
   }
@@ -66,10 +64,6 @@ int main() {
   // Wrap up
   for (auto &producer_thread : producers) {
     producer_thread.join();
-  }
-  {
-    auto guard = std::lock_guard<std::mutex>(queue.mtx);
-    queue.finished = true;
   }
   for (auto &consumer_thread : consumers) {
     consumer_thread.join();
