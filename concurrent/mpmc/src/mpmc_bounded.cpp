@@ -11,9 +11,9 @@ constexpr auto MAX_QUEUE_SIZE = 100;
 constexpr auto COUNTER_WORK = 100000;
 
 template <typename T>
-class LockedQueueTwoCond {
+class BoundedQueue {
  public:
-  LockedQueueTwoCond(size_t capacity) : max_capicity(capacity) {
+  BoundedQueue(size_t capacity) : max_capicity(capacity) {
     queue.reserve(capacity);
   }
 
@@ -52,7 +52,7 @@ int main() {
   producers.reserve(threads);
   std::vector<std::thread> consumers;
   consumers.reserve(threads);
-  LockedQueueTwoCond<int> queue(MAX_QUEUE_SIZE);
+  BoundedQueue<int> queue(MAX_QUEUE_SIZE);
 
   for (size_t i = 0; i < threads; ++i) {
     producers.emplace_back([&queue]() {
