@@ -9,6 +9,8 @@ make
 sudo ./benchmark/mpmc_bench --benchmark_repetitions=3 --benchmark_perf_counters="CYCLES,INSTRUCTIONS"
 ```
 
+Use --benchmark_filter=<regex> to run specific benchmarks
+
 ## Observations:
 * Using random in multihreaded testing environment is actually bad since random itself
 takes a lock on a global state causing additional overhead when testing mutex
