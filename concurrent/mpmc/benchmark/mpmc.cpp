@@ -7,8 +7,9 @@
 #include <thread>
 #include <vector>
 
-constexpr auto COUNTER_WORK = 1000000;
+constexpr auto WORK_PER_THREAD = 1'000'000;
 
+/// Fight for mutex
 template <typename T>
 struct MutexQueue {
   MutexQueue() {}
@@ -30,6 +31,8 @@ struct MutexQueue {
   size_t max_capacity;
 };
 
+/// Unbounded queue with single cond var that signals when the item is put inside
+/// queue
 template <typename T>
 class UnboundedQueue {
  public:
@@ -55,6 +58,7 @@ class UnboundedQueue {
   size_t max_capacity;
 };
 
+/// Bounded queue that signals when the queue is not empty and not full
 template <typename T>
 class BoundedQueue {
  public:
@@ -101,7 +105,7 @@ static void BM_MPMC_UnboundedMutex(benchmark::State &state) {
 
     for (size_t i = 0; i < threads; ++i) {
       producers.emplace_back([&queue]() {
-        auto counter = COUNTER_WORK;
+        auto counter = WORK_PER_THREAD;
         while (counter != 0) {
           auto guard = std::lock_guard<std::mutex>(queue.mtx);
           queue.Append(counter);
@@ -111,7 +115,7 @@ static void BM_MPMC_UnboundedMutex(benchmark::State &state) {
     }
     for (size_t i = 0; i < threads; ++i) {
       consumers.emplace_back([&queue]() {
-        auto counter = COUNTER_WORK;
+        auto counter = WORK_PER_THREAD;
         while (counter != 0) {
           auto guard = std::lock_guard<std::mutex>(queue.mtx);
           if (!queue.queue.empty()) {
@@ -146,7 +150,7 @@ static void BM_MPMC_BoundedMutex(benchmark::State &state) {
 
     for (size_t i = 0; i < threads; ++i) {
       producers.emplace_back([&queue]() {
-        auto counter = COUNTER_WORK;
+        auto counter = WORK_PER_THREAD;
         while (counter != 0) {
           {
             auto guard = std::lock_guard<std::mutex>(queue.mtx);
@@ -161,7 +165,7 @@ static void BM_MPMC_BoundedMutex(benchmark::State &state) {
     }
     for (size_t i = 0; i < threads; ++i) {
       consumers.emplace_back([&queue]() {
-        auto counter = COUNTER_WORK;
+        auto counter = WORK_PER_THREAD;
         while (counter != 0) {
           auto guard = std::lock_guard<std::mutex>(queue.mtx);
           if (!queue.queue.empty()) {
@@ -197,7 +201,7 @@ static void BM_MPMC_Unbounded(benchmark::State &state) {
     state.ResumeTiming();
     for (size_t i = 0; i < threads; ++i) {
       producers.emplace_back([&queue]() {
-        auto counter = COUNTER_WORK;
+        auto counter = WORK_PER_THREAD;
         while (counter != 0) {
           queue.Append(counter);
           counter--;
@@ -206,7 +210,7 @@ static void BM_MPMC_Unbounded(benchmark::State &state) {
     }
     for (size_t i = 0; i < threads; ++i) {
       consumers.emplace_back([&queue]() {
-        auto counter = COUNTER_WORK;
+        auto counter = WORK_PER_THREAD;
         while (counter != 0) {
           queue.Pop();
           --counter;
@@ -239,7 +243,7 @@ static void BM_MPMC_Bounded(benchmark::State &state) {
     state.ResumeTiming();
     for (size_t i = 0; i < threads; ++i) {
       producers.emplace_back([&queue]() {
-        auto counter = COUNTER_WORK;
+        auto counter = WORK_PER_THREAD;
         while (counter != 0) {
           queue.Append(counter);
           counter--;
@@ -248,7 +252,7 @@ static void BM_MPMC_Bounded(benchmark::State &state) {
     }
     for (size_t i = 0; i < threads; ++i) {
       consumers.emplace_back([&queue]() {
-        auto counter = COUNTER_WORK;
+        auto counter = WORK_PER_THREAD;
         while (counter != 0) {
           queue.Pop();
           --counter;
