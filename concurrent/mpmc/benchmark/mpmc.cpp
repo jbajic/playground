@@ -186,8 +186,8 @@ static void BM_MPMC_BoundedMutexQueueVector(benchmark::State &state) {
             if (queue.queue.size() < queue.max_capacity) {
               auto num = counter;
               queue.Append(num);
+              --counter;
             }
-            --counter;
           }
         }
       });
@@ -199,8 +199,8 @@ static void BM_MPMC_BoundedMutexQueueVector(benchmark::State &state) {
           auto guard = std::lock_guard<std::mutex>(queue.mtx);
           if (!queue.queue.empty()) {
             queue.Pop();
+            --counter;
           }
-          --counter;
         }
       });
     }
