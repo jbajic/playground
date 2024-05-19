@@ -4,10 +4,33 @@
 #include <condition_variable>
 #include <cstddef>
 #include <mutex>
+#include <queue>
 #include <thread>
 #include <vector>
 
-constexpr auto WORK_PER_THREAD = 1'000'000;
+constexpr auto WORK_PER_THREAD = 10'000'000;
+
+/// Fight for mutex
+template <typename T>
+struct MutexQueueWithList {
+  MutexQueueWithList() {}
+
+  MutexQueueWithList(size_t max_capacity) : max_capacity(max_capacity) {}
+
+  void Reserve(size_t) {}
+
+  void Append(T num) { queue.push(num); }
+
+  T Pop() {
+    auto elem = queue.back();
+    queue.pop();
+    return elem;
+  }
+
+  std::mutex mtx;
+  std::queue<T> queue;
+  size_t max_capacity;
+};
 
 /// Fight for mutex
 template <typename T>
@@ -17,6 +40,8 @@ struct MutexQueue {
   MutexQueue(size_t max_capacity) : max_capacity(max_capacity) {
     queue.reserve(max_capacity);
   }
+
+  void Reserve(size_t capacity) { queue.reserve(capacity); }
 
   void Append(T num) { queue.push_back(num); }
 
@@ -31,8 +56,8 @@ struct MutexQueue {
   size_t max_capacity;
 };
 
-/// Unbounded queue with single cond var that signals when the item is put inside
-/// queue
+/// Unbounded queue with single cond var that signals when the item is put
+/// inside queue
 template <typename T>
 class UnboundedQueue {
  public:
@@ -50,6 +75,8 @@ class UnboundedQueue {
     queue.pop_back();
     return elem;
   }
+
+  void Reserve(size_t capacity) { queue.reserve(capacity); }
 
  private:
   std::mutex mtx;
@@ -91,7 +118,7 @@ class BoundedQueue {
   size_t max_capicity;
 };
 
-static void BM_MPMC_UnboundedMutex(benchmark::State &state) {
+static void BM_MPMC_UnboundedMutexQueueVector(benchmark::State &state) {
   size_t threads = std::thread::hardware_concurrency() / 2;
 
   assert(threads % 2 == 0);
@@ -102,6 +129,8 @@ static void BM_MPMC_UnboundedMutex(benchmark::State &state) {
     std::vector<std::thread> consumers;
     consumers.reserve(threads);
     MutexQueue<int> queue;
+    // Reserve to avoid allocation
+    queue.Reserve(10000);
 
     for (size_t i = 0; i < threads; ++i) {
       producers.emplace_back([&queue]() {
@@ -136,7 +165,7 @@ static void BM_MPMC_UnboundedMutex(benchmark::State &state) {
   }
 }
 
-static void BM_MPMC_BoundedMutex(benchmark::State &state) {
+static void BM_MPMC_BoundedMutexQueueVector(benchmark::State &state) {
   size_t threads = std::thread::hardware_concurrency() / 2;
 
   assert(threads % 2 == 0);
@@ -186,7 +215,7 @@ static void BM_MPMC_BoundedMutex(benchmark::State &state) {
   }
 }
 
-static void BM_MPMC_Unbounded(benchmark::State &state) {
+static void BM_MPMC_UnboundedConditional(benchmark::State &state) {
   size_t threads = std::thread::hardware_concurrency() / 2;
   assert(threads % 2 == 0);
 
@@ -197,6 +226,7 @@ static void BM_MPMC_Unbounded(benchmark::State &state) {
     std::vector<std::thread> consumers;
     consumers.reserve(threads);
     UnboundedQueue<int> queue;
+    queue.Reserve(10000);
 
     state.ResumeTiming();
     for (size_t i = 0; i < threads; ++i) {
@@ -228,7 +258,7 @@ static void BM_MPMC_Unbounded(benchmark::State &state) {
   }
 }
 
-static void BM_MPMC_Bounded(benchmark::State &state) {
+static void BM_MPMC_BoundedConditional(benchmark::State &state) {
   size_t threads = std::thread::hardware_concurrency() / 2;
   assert(threads % 2 == 0);
 
@@ -270,29 +300,21 @@ static void BM_MPMC_Bounded(benchmark::State &state) {
   }
 }
 
-BENCHMARK(BM_MPMC_UnboundedMutex)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_MPMC_UnboundedMutexQueueVector)
+    ->Unit(benchmark::kMillisecond)
+    ->MeasureProcessCPUTime();
 
-BENCHMARK(BM_MPMC_BoundedMutex)
-    ->RangeMultiplier(10)
-    ->Range(10, 1000)
-    ->Unit(benchmark::kMillisecond);
-
-BENCHMARK(BM_MPMC_BoundedMutex)
+BENCHMARK(BM_MPMC_BoundedMutexQueueVector)
     ->RangeMultiplier(10)
     ->Range(10, 1000)
     ->Unit(benchmark::kMillisecond)
     ->MeasureProcessCPUTime();
 
-BENCHMARK(BM_MPMC_Unbounded)->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_MPMC_Unbounded)
+BENCHMARK(BM_MPMC_UnboundedConditional)
     ->Unit(benchmark::kMillisecond)
     ->MeasureProcessCPUTime();
 
-BENCHMARK(BM_MPMC_Bounded)
-    ->RangeMultiplier(10)
-    ->Range(10, 1000)
-    ->Unit(benchmark::kMillisecond);
-BENCHMARK(BM_MPMC_Bounded)
+BENCHMARK(BM_MPMC_BoundedConditional)
     ->RangeMultiplier(10)
     ->Range(10, 1000)
     ->Unit(benchmark::kMillisecond)
