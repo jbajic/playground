@@ -118,7 +118,7 @@ class BoundedQueue {
   size_t max_capicity;
 };
 
-static void BM_MPMC_UnboundedMutexQueueVector(benchmark::State &state) {
+static void BM_MPMC_UnboundedQueueVectorMutex(benchmark::State &state) {
   size_t threads = std::thread::hardware_concurrency() / 2;
 
   assert(threads % 2 == 0);
@@ -165,7 +165,7 @@ static void BM_MPMC_UnboundedMutexQueueVector(benchmark::State &state) {
   }
 }
 
-static void BM_MPMC_BoundedMutexQueueVector(benchmark::State &state) {
+static void BM_MPMC_BoundedQueueVectorMutex(benchmark::State &state) {
   size_t threads = std::thread::hardware_concurrency() / 2;
 
   assert(threads % 2 == 0);
@@ -215,7 +215,7 @@ static void BM_MPMC_BoundedMutexQueueVector(benchmark::State &state) {
   }
 }
 
-static void BM_MPMC_UnboundedConditional(benchmark::State &state) {
+static void BM_MPMC_UnboundedQueueConditional(benchmark::State &state) {
   size_t threads = std::thread::hardware_concurrency() / 2;
   assert(threads % 2 == 0);
 
@@ -258,7 +258,7 @@ static void BM_MPMC_UnboundedConditional(benchmark::State &state) {
   }
 }
 
-static void BM_MPMC_BoundedConditional(benchmark::State &state) {
+static void BM_MPMC_BoundedQueueConditional(benchmark::State &state) {
   size_t threads = std::thread::hardware_concurrency() / 2;
   assert(threads % 2 == 0);
 
@@ -300,21 +300,21 @@ static void BM_MPMC_BoundedConditional(benchmark::State &state) {
   }
 }
 
-BENCHMARK(BM_MPMC_UnboundedMutexQueueVector)
+BENCHMARK(BM_MPMC_UnboundedQueueVectorMutex)
     ->Unit(benchmark::kMillisecond)
     ->MeasureProcessCPUTime();
 
-BENCHMARK(BM_MPMC_BoundedMutexQueueVector)
+BENCHMARK(BM_MPMC_BoundedQueueVectorMutex)
     ->RangeMultiplier(10)
     ->Range(10, 1000)
     ->Unit(benchmark::kMillisecond)
     ->MeasureProcessCPUTime();
 
-BENCHMARK(BM_MPMC_UnboundedConditional)
+BENCHMARK(BM_MPMC_UnboundedQueueConditional)
     ->Unit(benchmark::kMillisecond)
     ->MeasureProcessCPUTime();
 
-BENCHMARK(BM_MPMC_BoundedConditional)
+BENCHMARK(BM_MPMC_BoundedQueueConditional)
     ->RangeMultiplier(10)
     ->Range(10, 1000)
     ->Unit(benchmark::kMillisecond)
