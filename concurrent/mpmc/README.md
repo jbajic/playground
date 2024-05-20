@@ -1,6 +1,8 @@
 # Running benchmarks
 
 Install google benchmark and perf support
+Disable CPU scaling mode, by turning on performance mode:
+`sudo sh -c "echo performance | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"`
 
 
 ```bash
