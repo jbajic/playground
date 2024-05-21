@@ -1,9 +1,15 @@
 # Running benchmarks
 
 Install google benchmark and perf support
+
+## CPU mode
+Check it with:
+`cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor`
+
 Disable CPU scaling mode, by turning on performance mode:
 `sudo sh -c "echo performance | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"`
 
+## Running them
 
 ```bash
 cmake -DCMAKE_BUILD_TYPE=Release .. 
