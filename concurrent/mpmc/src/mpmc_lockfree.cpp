@@ -53,6 +53,28 @@ class UnboundedLockFreeQueue {
     }
   }
 
+  std::optional<T> Pop() {
+    while (true) {
+      auto* first = head.load(std::memory_order_relaxed);
+      auto* last = tail.load(std::memory_order_relaxed);
+      auto* next = first->next.load(std::memory_order_relaxed);
+      
+      if (first == head.load(std::memory_order_relaxed)) {
+        if (first == last) {
+          if (next == nullptr) {
+            return {};
+          }
+          tail.compare_exchange_weak(last, next);
+        } else {
+          auto value = next->value;
+          if (head.compare_exchange_weak(first, next)) {
+            return value;
+          }
+        }
+      }
+    }
+  }
+
  private:
   struct Node {
     Node(T data) : data{data} {}
