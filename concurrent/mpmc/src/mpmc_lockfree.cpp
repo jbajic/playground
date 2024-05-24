@@ -16,10 +16,10 @@ class UnboundedLockFreeQueue {
    * attempts to append the new node by calling compare_exchange_weak() (Line 41). (A
    * compare_exchange_weak() is required because other threads may be trying the same
    * thing.) If the compare_exchange_weak() succeeds, the thread uses a second
-   * compare_exchange_weak() to advance tail to the new node (Line 43). Even if this
+   * compare_exchange_weak() to advance tail to the new node (Line 44). Even if this
    * second compare_exchange_weak() call fails, the thread can still return successfully
    * because, as we will see, the call fails only if some other thread “helped”
-   * it by advancing tail. If the tail node has a successor (Line 46), then the
+   * it by advancing tail. If the tail node has a successor (Line 47), then the
    * method tries to “help” other threads by advancing tail to refer directly to
    * the successor (Line 47) before trying again to insert its own node. This
    * enq() is total, meaning that it never waits for a dequeuer. A successful
@@ -39,12 +39,14 @@ class UnboundedLockFreeQueue {
         if (next == nullptr) {
           // Set the next pointer to the new node
           if (last.next.compare_exchange_weak(next, node)) {
-            // Update the new tail with the new node
+            // Update the new tail with the new node, even if this fails
+            // some other thread can help us advance the tail
             tail.compare_exchange_weak(last, node);
             return;
           }
         } else {
           // We help other threads by advancing the current tail to the next one
+          // and we retry
           tail.compare_exchange_weak(last, next);
         }
       }
