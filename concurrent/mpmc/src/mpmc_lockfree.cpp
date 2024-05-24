@@ -32,13 +32,13 @@ class UnboundedLockFreeQueue {
   void Push(const T& data) {
     auto node = std::make_shared(data);
     while (true) {
-      Node last = tail.load(std::memory_order_relaxed);
-      Node next = last.next.load(std::memory_order_relaxed);
+      auto* last = tail.load(std::memory_order_relaxed);
+      auto* next = last->next.load(std::memory_order_relaxed);
       // Check if somebody already changed tail, if so retry
       if (last == tail.load(std::memory_order_relaxed)) {
         if (next == nullptr) {
           // Set the next pointer to the new node
-          if (last.next.compare_exchange_weak(next, node)) {
+          if (last->next.compare_exchange_weak(next, node)) {
             // Update the new tail with the new node, even if this fails
             // some other thread can help us advance the tail
             tail.compare_exchange_weak(last, node);
