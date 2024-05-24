@@ -27,7 +27,7 @@ class UnboundedLockFreeQueue {
    * concurrent helping thread) calls compare_exchange_weak() to redirect the tail field
    * to the new node at Line 47
    *
-   * The Art of Multiprocessprogramming, 10.5 Chapter (Unbounded Lock Free Queue)
+   * The Art of Multiprocessprogramming, Maurice Herlihy, Nir Shavit, 10.5 Chapter (Unbounded Lock Free Queue)
    */
   void Push(const T& data) {
     auto node = std::make_shared(data);
